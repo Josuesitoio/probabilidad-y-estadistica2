@@ -625,7 +625,7 @@ button, .btn, .quiz-option {
 
 /* valor por defecto: oculto (siempre) */
 .mobile-menu {
-  display: none !important; /* oculto por defecto en todas las pantallas */
+  display: none; /* oculto por defecto en todas las pantallas */
   visibility: hidden;
   opacity: 0;
   transform: translateY(-6px) scaleY(0.98);
@@ -752,38 +752,42 @@ button, .btn, .quiz-option {
 </head>
 <body>
 <nav class="topbar" role="navigation" aria-label="Main navigation">
-  <div class="bar">
-    <div class="brand" aria-hidden="false">
-      <div class="logo">PyE</div>
-      <div class="brand-text">
-        <h4>Probabilidad y Estadística</h4>
-        <p>Elavoracion de Proyecto Final</p>
-      </div>
+    <div class="bar">
+        <div class="brand" aria-hidden="false">
+            <div class="logo">PyE</div>
+            <div class="brand-text">
+                <h4>Probabilidad y Estadística</h4>
+                <p>Elavoracion de Proyecto Final</p>
+            </div>
+        </div>
+
+        <div class="main-links">
+            <a class="nav-link" href="index.html">Estadísticas</a>
+            <a class="nav-link" href="MetodoCientifico.html">Método Científico</a>
+            <a class="nav-link" href="#">Explicación</a>
+        </div>
+
+        <div class="controls">
+        
+            <button class="btn" id="theme-toggle" type="button" aria-label="Cambiar tema" aria-pressed="false">
+                </button>
+    
+            <button class="btn hamburger" id="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+            </button>
+            
+        </div>
+        </div>
+
+    <div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
+        <ul class="mobile-nav-list">
+            <li><a href="index.html" role="menuitem">Estadísticas</a></li>
+            <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
+            <li><a href="#" role="menuitem">Explicación</a></li>
+        </ul>
     </div>
-
-    <!-- ENLACES PRINCIPALES: siempre visibles en desktop; en móvil se quedan dentro del menú -->
-    <div class="main-links">
-      <a class="nav-link" href="index.html">Estadísticas</a>
-      <a class="nav-link" href="MetodoCientifico.html">Método Científico</a>
-      <a class="nav-link" href="#">Explicación</a>
-    </div>
-
-    <!-- BOTÓN HAMBURGER para móvil -->
-    <button class="btn hamburger" id="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      </svg>
-    </button>
-  </div>
-
-  <!-- MENÚ MÓVIL (solo con los mismos 3 enlaces) -->
-  <div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
-    <ul class="mobile-nav-list">
-      <li><a href="index.html" role="menuitem">Estadísticas</a></li>
-      <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
-      <li><a href="#" role="menuitem">Explicación</a></li>
-    </ul>
-  </div>
 </nav>
 
 
@@ -796,7 +800,6 @@ button, .btn, .quiz-option {
         
         <div class="page-layout">
             <aside class="sidebar">
-                <nav>
                     <ul class="sidebar-nav">
                         <li><a href="#descriptiva">1. Estadística Descriptiva</a></li>
                         <li><a href="#frecuencias">2. Tablas de Frecuencia</a></li>
@@ -805,7 +808,6 @@ button, .btn, .quiz-option {
                         <li><a href="#manejo">5. Manejo de Datos</a></li>
                         <li><a href="#quiz">6. Quiz Interactivo</a></li>
                     </ul>
-                </nav>
             </aside>
 
             <main class="main-content">
