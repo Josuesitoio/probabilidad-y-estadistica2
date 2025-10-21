@@ -117,29 +117,121 @@ body::after {
 }
 
 
-/* --- 3. CONTENEDORES Y NAVEGACIÓN --- */
 .container {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 1rem;
-  position: relative; /* Asegura que esté sobre el fondo */
-  z-index: 10;
+
+  width: calc(100% - 24px); 
+  max-width: 1400px;      
+  margin: 0 auto;
 }
 
- /* ---------- FIX: MOBILE MENU - asegurar que NO se muestre en desktop ---------- */
+ /* --- 3. ESTILOS DEL NAVBAR (AHORA SÍ) --- */
+
+/* --- 3. ESTILOS DEL NAVBAR --- */
+
+/* Contenedor principal del Nav */
+.topbar {
+  /* Posicionamiento y efecto "sticky" (se pega arriba) */
+  position: sticky;
+  top: 8px; /* Un pequeño margen superior */
+  z-index: 1000;
+
+  /* Centrado y ancho (con márgenes laterales) */
+  width: calc(100% - 24px); 
+  max-width: 1400px; 
+  margin: 0 auto 1.5rem auto; /* 0 auto (centrado) y margen inferior */
+
+  /* Estilo Glassmorphism (usando tus variables) */
+  background: var(--card-bg-glass);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--border-color);
+  border-radius: 14px; /* Más redondeado que los botones */
+  box-shadow: var(--shadow);
+  
+  /* Padding interno */
+  padding: 8px 16px;
+  
+  /* Evita que el fondo de luces se filtre (opcional pero recomendado) */
+  isolation: isolate;
+}
+
+
+/* El contenedor interno que alinea el logo y los links */
+.bar {
+  display: flex;
+  justify-content: space-between; /* Logo a la izquierda, links/hamburger a la derecha */
+  align-items: center;
+  width: 100%;
+  min-height: 56px; /* Una altura estándar cómoda */
+  gap: 1.5rem; /* Espacio entre logo y links */
+}
+
+/* Contenedor del logo + texto */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0; /* Evita que se encoja si no hay espacio */
+  text-decoration: none; /* Si decides hacerla un link */
+}
+
+/* El logo "PyE" */
+.logo {
+  font-family: 'Fira Code', monospace; /* Usando una fuente de tu import */
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--accent-2); /* Tono dorado */
+  background: rgba(var(--accent-2-rgb), 0.1);
+  border-radius: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(var(--accent-2-rgb), 0.2);
+}
+
+/* Textos al lado del logo */
+.brand-text h4 {
+  font-family: 'Playfair Display', serif; /* Coincide con tus títulos */
+  color: var(--text-2);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-text p {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* --- 3.1 LÓGICA RESPONSIVA DEL NAV --- */
 
 /* valor por defecto: oculto (siempre) */
 .mobile-menu {
-  display: none !important; /* oculto por defecto en todas las pantallas */
+  display: none;
   visibility: hidden;
   opacity: 0;
   transform: translateY(-6px) scaleY(0.98);
 }
 
-/* botón hamburger por defecto oculto (lo mostraremos en media queries) */
-.hamburger {
-  display: none;
+/* botón hamburger por defecto oculto (lo mostraremos en media queries) 
+ * USAMOS .hamburger.btn para mayor especificidad
+ */
+.hamburger.btn {
+  display: none; /* <-- OCULTO EN ESCRITORIO */
+  background: transparent;
+  border: 1px solid var(--card-border);
+  padding: 8px 10px;
+  border-radius: 10px;
 }
+.hamburger svg.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--muted);
+}
+.hamburger:hover svg.icon {
+  color: var(--text);
+}
+
 
 /* Links principales (desktop) */
 .main-links {
@@ -161,7 +253,8 @@ body::after {
 }
 .main-links .nav-link:hover, .main-links .nav-link:focus {
   color: var(--text);
-  background: var(--card-bg-solid);
+  background: var(--card-bg-solid); /* variable no definida, puede fallar? Reviso... no, la tienes como --card-bg-glass, usaré esa */
+  background: var(--card-bg-glass); /* <-- Usando tu variable existente */
   border-color: var(--card-border);
   transform: translateY(-2px);
 }
@@ -171,32 +264,37 @@ body::after {
 
   /* esconder los links principales, mostrar hamburger */
   .main-links { display: none; }
-  .hamburger {
-    display: inline-flex;
-    background: transparent;
-    border: 1px solid var(--card-border);
-    padding: 8px 10px;
-    border-radius: 10px;
+  
+  .hamburger.btn {
+    display: inline-flex; /* <-- MOSTRAR EN MÓVIL */
   }
 
-  /* panel del menú móvil: solo se muestra cuando .open está presente */
+/* panel del menú móvil: solo se muestra cuando .open está presente */
   .mobile-menu {
     position: fixed;
-    top: calc(72px + 8px); /* ajusta si cambias la altura del nav */
+    top: calc(72px + 8px); /* (altura nav + margen top) + margen extra */
+    
+    /* --- 1. CENTRADO (Igual que el nav) --- */
+    /* Se centra usando los mismos 12px de margen a cada lado */
     left: 12px;
     right: 12px;
-    background: var(--card);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
+    /* Esto hace que tenga el mismo ancho que el nav: calc(100% - 24px) */
+    
+    /* --- 2. FONDO (Idéntico al nav) --- */
+    background: var(--card-bg-glass); /* Fondo transparente */
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); /* Filtro blur */
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); /* Filtro blur */
+    border: 1px solid var(--border-color); /* Borde */
+    border-radius: 14px; /* Esquinas redondeadas */
+    box-shadow: var(--shadow); /* Sombra (la misma variable que el nav) */
+    
+    /* --- Resto de estilos --- */
+    z-index: 1400; /* Asegura que esté por encima */
     padding: 10px;
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-    box-shadow: 0 10px 30px rgba(2,8,20,0.45);
-    z-index: 1400;
     transform-origin: top center;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-
+  
     /* estado oculto (inicio) */
     display: none;
     visibility: hidden;
@@ -221,8 +319,8 @@ body::after {
     min-height:44px; display:inline-flex; align-items:center;
   }
   .mobile-nav-list a:hover, .mobile-nav-list a:focus {
-    background: var(--card-bg-solid);
-    color: var(--accent1);
+    background: rgba(var(--accent-rgb), 0.1); /* Fondo suave al pasar el mouse */
+    color: var(--accent);
     outline: none;
   }
 
@@ -233,9 +331,10 @@ body::after {
 /* ---------- Garantía extra: en pantallas grandes reforzamos ocultamiento del mobile-menu ---------- */
 @media (min-width: 1025px) {
   .mobile-menu { display: none !important; visibility: hidden !important; opacity: 0 !important; }
-  .hamburger { display: none !important; }
+  .hamburger.btn { display: none !important; } /* <-- Usando .btn */
   .main-links { display: flex !important; }
 }
+
 
 header {
   text-align: center;
@@ -456,30 +555,27 @@ canvas {
       </div>
     </div>
 
-    <!-- ENLACES PRINCIPALES: siempre visibles en desktop; en móvil se quedan dentro del menú -->
     <div class="main-links">
       <a class="nav-link" href="#">Estadísticas</a>
       <a class="nav-link" href="MetodoCientifico.html">Método Científico</a>
       <a class="nav-link" href="explicacion.html">Explicación</a>
     </div>
 
-    <!-- BOTÓN HAMBURGER para móvil -->
     <button class="btn hamburger" id="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
     </button>
   </div>
-
-  <!-- MENÚ MÓVIL (solo con los mismos 3 enlaces) -->
-  <div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
-    <ul class="mobile-nav-list">
-      <li><a href="#" role="menuitem">Estadísticas</a></li>
-      <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
-      <li><a href="explicacion.html" role="menuitem">Explicación</a></li>
-    </ul>
-  </div>
 </nav>
+
+<div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
+  <ul class="mobile-nav-list">
+    <li><a href="#" role="menuitem">Estadísticas</a></li>
+    <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
+    <li><a href="explicacion.html" role="menuitem">Explicación</a></li>
+  </ul>
+</div>
 
 <p>
  
@@ -1192,3 +1288,4 @@ document.addEventListener('DOMContentLoaded', () => {
   </script>
 </body>
 </html>
+
