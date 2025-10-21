@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Suite de Análisis Estadístico — Versión Final</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Playfair+Display:wght@400;600;700&display=swap');
+
+/* --- 1. PALETA DE COLORES "MODERNO / VINTAGE" --- */
+:root {
+  /* Paleta principal */
+  --bg-dark-1: #0f1720;
+  --bg-dark-2: #17232b;
+  --accent: #8db4d8;    /* cool blue */
+  --accent-rgb: 141, 180, 216;
+  --accent-2: #d6b57b;   /* vintage gold */
+  --accent-2-rgb: 214, 181, 123;
+  --muted: #9fb4c6;
+  --glass-blur: 14px;
+  --card-bg-glass: rgba(255, 255, 255, 0.04);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --glass-sat: 110%;
+  --text: #eef6fb;
+  --text-2: #d8e8f5;
+  --shadow: 0 18px 50px rgba(2, 8, 20, 0.55);
+  --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.04"/></svg>');
+
+  /* Mapeo de variables del Dashboard */
+  --primary: var(--accent);
+  --primary-glow: rgba(var(--accent-rgb), 0.3);
+  --accent-secondary: var(--accent-2); /* Renombrado para evitar conflicto */
+  --accent-glow: rgba(var(--accent-2-rgb), 0.4);
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01)); /* Estilo de bloque */
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+  --border-color: var(--card-border);
+  --shadow-color: rgba(2, 8, 20, 0.55);
+  --border-radius: 12px;
+  --transition-speed: 0.3s;
+}
+
+:root.light {
+  --bg-dark-1: #f6f9fb;
+  --bg-dark-2: #eef6fb;
+  --accent: #3760b5;
+  --accent-rgb: 55, 96, 181;
+  --accent-2: #c69f5a;
+  --accent-2-rgb: 198, 159, 90;
+  --muted: #46627f;
+  --card-bg-glass: rgba(17, 24, 39, 0.03);
+  --card-border: rgba(2, 8, 20, 0.06);
+  --text: #10202b;
+  --text-2: #163247;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence baseFrequency="0.6" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.02"/></svg>');
+  
+  --card-bg: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+  --border-color: var(--card-border);
+  --shadow-color: rgba(15, 23, 42, 0.06);
+}
+
+
+/* --- 2. ANIMACIONES Y EFECTOS DE FONDO --- */
+@keyframes pulseLights {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+@keyframes subtlePan {
+  0% { background-position: 50% 0%; }
+  50% { background-position: 50% 100%; }
+  100% { background-position: 50% 0%; }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-dark-1);
+  line-height: 1.6;
+  position: relative;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(ellipse 60% 80% at -10% 10%, rgba(var(--accent-rgb), 0.4), transparent 60%),
+    radial-gradient(ellipse 50% 70% at 90% 90%, rgba(var(--accent-rgb), 0.15), transparent 70%);
+  background-repeat: no-repeat;
+  animation: pulseLights 6s ease-in-out infinite;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  background-image: var(--grain);
+  z-index: 1;
+  opacity: 0.5;
+}
+
+
+/* --- 3. CONTENEDORES Y NAVEGACIÓN --- */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+  position: relative; /* Asegura que esté sobre el fondo */
+  z-index: 10;
+}
+
+ /* ---------- FIX: MOBILE MENU - asegurar que NO se muestre en desktop ---------- */
+
+/* valor por defecto: oculto (siempre) */
+.mobile-menu {
+  display: none !important; /* oculto por defecto en todas las pantallas */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px) scaleY(0.98);
+}
+
+/* botón hamburger por defecto oculto (lo mostraremos en media queries) */
+.hamburger {
+  display: none;
+}
+
+/* Links principales (desktop) */
+.main-links {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* estilos de link */
+.main-links .nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all .18s ease;
+  border: 1px solid transparent;
+}
+.main-links .nav-link:hover, .main-links .nav-link:focus {
+  color: var(--text);
+  background: var(--card-bg-solid);
+  border-color: var(--card-border);
+  transform: translateY(-2px);
+}
+
+/* ---------- Reglas para pantalla móvil (<= 1024px) ---------- */
+@media (max-width: 1024px) {
+
+  /* esconder los links principales, mostrar hamburger */
+  .main-links { display: none; }
+  .hamburger {
+    display: inline-flex;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+
+  /* panel del menú móvil: solo se muestra cuando .open está presente */
+  .mobile-menu {
+    position: fixed;
+    top: calc(72px + 8px); /* ajusta si cambias la altura del nav */
+    left: 12px;
+    right: 12px;
+    background: var(--card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 10px;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    box-shadow: 0 10px 30px rgba(2,8,20,0.45);
+    z-index: 1400;
+    transform-origin: top center;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+
+    /* estado oculto (inicio) */
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.98);
+    transition: transform 220ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease, visibility 0s linear 220ms;
+  }
+
+  /* cuando tenga .open se muestra (display:block + transición) */
+  .mobile-menu.open {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    transition: transform 220ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease;
+  }
+
+  .mobile-nav-list { list-style:none; margin:0; padding: 6px; display:flex; flex-direction:column; gap:8px; }
+  .mobile-nav-list a {
+    display:block; padding: 12px 14px; text-decoration:none; color:var(--text); border-radius:10px;
+    font-weight:600;
+    min-height:44px; display:inline-flex; align-items:center;
+  }
+  .mobile-nav-list a:hover, .mobile-nav-list a:focus {
+    background: var(--card-bg-solid);
+    color: var(--accent1);
+    outline: none;
+  }
+
+  /* cuando el menú está abierto, evitamos scroll en body (JS añade la clase) */
+  body.menu-open { overflow: hidden; touch-action: none; }
+}
+
+/* ---------- Garantía extra: en pantallas grandes reforzamos ocultamiento del mobile-menu ---------- */
+@media (min-width: 1025px) {
+  .mobile-menu { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+  .hamburger { display: none !important; }
+  .main-links { display: flex !important; }
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-2);
+  /* Animación de neón eliminada para un look más limpio */
+}
+header p {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+}
+
+section {
+  /* Estilo de .sheet principal */
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--border-color);
+  border-radius: 18px; /* Radio del .sheet */
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+section:nth-of-type(2) { animation-delay: 0.1s; }
+section:nth-of-type(3) { animation-delay: 0.2s; }
+section:nth-of-type(4) { animation-delay: 0.3s; }
+
+section h2, .chart-wrapper h3 {
+  font-family: 'Playfair Display', serif;
+  color: var(--accent); /* Azul */
+  border-bottom: 1px dashed var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 1.75rem;
+}
+
+/* --- 4. FORMULARIOS Y BOTONES --- */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+select, input[type="file"], input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  font-family: inherit;
+  transition: all var(--transition-speed) ease;
+}
+select:focus, input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.filter-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  align-items: flex-end;
+}
+
+button {
+  /* Estilo de .btn */
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all var(--transition-speed) ease;
+}
+button:hover {
+  transform: translateY(-2px);
+  color: var(--text-primary);
+  border-color: var(--accent);
+}
+button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* --- 5. TARJETAS, TABLAS Y GRÁFICOS --- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.card {
+  /* Estilo de .highlight-block */
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-secondary); /* Dorado */
+  transition: all var(--transition-speed) ease;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.card h4 {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-secondary); /* Dorado */
+  font-family: 'Playfair Display', serif;
+}
+
+#data-table-container, section > div[style*="overflow:auto"] {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+thead th {
+  background: rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+tbody tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+tbody tr:hover {
+  background-color: var(--primary-glow);
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.chart-wrapper {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  /* El h3 ya está estilizado arriba */
+}
+canvas {
+  width: 100% !important;
+  max-height: 380px;
+  aspect-ratio: 2 / 1;
+  display: block;
+  border-radius: var(--border-radius);
+  background: rgba(0,0,0,0.1);
+  border: 1px solid var(--border-color);
+}
+
+/* --- 6. UTILIDADES DRAG & DROP --- */
+.category-dragger {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  min-height: 50px;
+}
+.draggable-category {
+  padding: 8px 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: grab;
+  transition: all var(--transition-speed) ease;
+  user-select: none;
+}
+.draggable-category:active {
+  cursor: grabbing;
+  background-color: var(--primary-glow);
+}
+.draggable-category.dragging {
+  opacity: 0.5;
+}
+
+.small { font-size: 0.9rem; color: var(--text-secondary); }
+.error { color: #e74c3c; } /* Mantener un color de error estándar */
+
+
+  </style>
+</head>
+<body>
+<nav class="topbar" role="navigation" aria-label="Main navigation">
+  <div class="bar">
+    <div class="brand" aria-hidden="false">
+      <div class="logo">PyE</div>
+      <div class="brand-text">
+        <h4>Probabilidad y Estadística</h4>
+        <p>Elavoracion de Proyecto Final</p>
+      </div>
+    </div>
+
+    <!-- ENLACES PRINCIPALES: siempre visibles en desktop; en móvil se quedan dentro del menú -->
+    <div class="main-links">
+      <a class="nav-link" href="#">Estadísticas</a>
+      <a class="nav-link" href="MetodoCientifico.html">Método Científico</a>
+      <a class="nav-link" href="explicacion.html">Explicación</a>
+    </div>
+
+    <!-- BOTÓN HAMBURGER para móvil -->
+    <button class="btn hamburger" id="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- MENÚ MÓVIL (solo con los mismos 3 enlaces) -->
+  <div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
+    <ul class="mobile-nav-list">
+      <li><a href="#" role="menuitem">Estadísticas</a></li>
+      <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
+      <li><a href="explicacion.html" role="menuitem">Explicación</a></li>
+    </ul>
+  </div>
+</nav>
+
+<p>
+ 
+  
+    
+     
+</p>
+  <div class="container">
+    <header>
+      <h1>Análisis Estadístico</h1>
+      <p>Gráficas, tabla de frecuencias y agrupación por filtrado simple.</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Datos y filtros</h2>
+        <div class="filter-controls">
+          <div>
+            <label for="analysis-column-select">Columna para analizar</label>
+            <select id="analysis-column-select"><option value="">-- Elige una columna --</option></select>
+          </div>
+          <div id="bin-controls-container" style="display:none;">
+            <label for="bin-count-input">Nº de Intervalos (opcional)</label>
+            <input type="number" id="bin-count-input" placeholder="Automático" min="2" max="50" />
+          </div>
+          <div>
+            <label for="group-by-column-select">Agrupar por (opcional)</label>
+            <select id="group-by-column-select"><option value="">-- Elige una columna --</option></select>
+          </div>
+          <div id="filter-value-container" style="display:none">
+            <label id="filter-value-label" for="filter-value-select">Filtrar por valor</label>
+            <select id="filter-value-select"></select>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button id="apply-filters-btn">Aplicar y Calcular</button>
+          <button id="clear-filters-btn" class="secondary">Limpiar</button>
+          <div style="flex:1">
+            <label for="file-input" style="font-weight:600;margin-bottom:6px;display:block">O carga archivo XLSX (opcional)</label>
+            <input type="file" id="file-input" accept=".xlsx" />
+            <div id="ordinal-controls-container" style="display:none; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+              <h4>Definir Orden para Datos Ordinales</h4>
+              <p class="small">La columna seleccionada parece categórica. Si tiene un orden lógico (ej. Malo &lt; Regular &lt; Bueno), arrastra las etiquetas para ordenarlas de menor a mayor y luego calcula.</p>
+              <div id="ordinal-categories" class="category-dragger"></div>
+              <div style="margin-top: 1rem;">
+                <button id="calculate-ordinal-btn">Calcular Estadísticas Ordinales</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Estadísticas descriptivas — <span id="stats-column-name">N/A</span></h2>
+        <div id="stats-grid"></div>
+        <div id="extended-stats" style="margin-top:12px"></div>
+      </section>
+
+      <section>
+        <h2>Tabla de frecuencias — <span id="freq-column-name">N/A</span></h2>
+        <div style="overflow:auto">
+          <table id="frequency-table">
+            <thead>
+              <tr>
+                <th id="freq-table-header">Opciones</th>
+                <th>Frecuencia Absoluta</th>
+                <th>Frec. Abs. Acumulada</th>
+                <th>Frec. Relativa (%)</th>
+                <th>Frec. Rel. Acumulada (%)</th>
+              </tr>
+            </thead>
+            <tbody id="frequency-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2>Visualización</h2>
+        <div class="charts-container">
+          <div class="chart-wrapper" id="histogram-wrapper">
+            <h3>Histograma (Barras) — <span id="histogram-chart-title">N/A</span></h3>
+            <canvas id="histogram-chart"></canvas>
+          </div>
+
+          <div class="chart-wrapper" id="gauss-wrapper">
+            <h3>Curva de Gauss (Normal)</h3>
+            <canvas id="gauss-chart"></canvas>
+          </div>
+
+          <div id="pie-chart-wrapper" class="chart-wrapper">
+            <h3 id="pie-chart-title-container">Análisis de Composición</h3>
+            <canvas id="pie-chart"></canvas>
+          </div>
+
+          <div id="bar-chart-wrapper" class="chart-wrapper">
+            <h3 id="bar-chart-title-container">Análisis de Distribución</h3>
+            <canvas id="bar-chart"></canvas>
+          </div>
+
+          <div id="frequency-chart-wrapper" class="chart-wrapper">
+            <h3>Gráfica de Frecuencia — Absoluta y % Acumulado (líneas)</h3>
+            <canvas id="frequency-chart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Datos (preview)</h2>
+        <div id="data-table-container"></div>
+      </section>
+
+      <div class="footer-note">versión creo final</div>
+    </main>
+  </div>
+
+  <!-- Dependencias -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+    let allData = [], headers = [];
+    const chartInstances = {};
+    const analysisColumnSelect = document.getElementById('analysis-column-select');
+    const groupByColumnSelect = document.getElementById('group-by-column-select');
+    const filterValueContainer = document.getElementById('filter-value-container');
+    const filterValueLabel = document.getElementById('filter-value-label');
+    const filterValueSelect = document.getElementById('filter-value-select');
+    const applyFiltersBtn = document.getElementById('apply-filters-btn');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const statsGrid = document.getElementById('stats-grid');
+    const extendedStats = document.getElementById('extended-stats');
+    const frequencyTableBody = document.getElementById('frequency-table-body');
+    const freqTableHeader = document.getElementById('freq-table-header');
+    const dataTableContainer = document.getElementById('data-table-container');
+    const statsColumnName = document.getElementById('stats-column-name');
+    const freqColumnName = document.getElementById('freq-column-name');
+    const histogramChartTitle = document.getElementById('histogram-chart-title');
+    const binControlsContainer = document.getElementById('bin-controls-container');
+    const binCountInput = document.getElementById('bin-count-input');
+    const fileInput = document.getElementById('file-input');
+    const barChartWrapper = document.getElementById('bar-chart-wrapper');
+    const pieChartWrapper = document.getElementById('pie-chart-wrapper');
+    const barChartTitleContainer = document.getElementById('bar-chart-title-container');
+    const pieChartTitleContainer = document.getElementById('pie-chart-title-container');
+    const histogramWrapper = document.getElementById('histogram-wrapper');
+    const gaussWrapper = document.getElementById('gauss-wrapper');
+    const frequencyChartWrapper = document.getElementById('frequency-chart-wrapper');
+
+    const ordinalControlsContainer = document.getElementById('ordinal-controls-container');
+    const ordinalCategoriesContainer = document.getElementById('ordinal-categories');
+    const calculateOrdinalBtn = document.getElementById('calculate-ordinal-btn');
+
+    const noDataPlugin = {
+      id: 'noData',
+      afterDraw(chart) {
+        const hasData = chart.data && chart.data.datasets && chart.data.datasets.some(ds => ds.data && ds.data.length > 0);
+        if (!hasData) {
+          const { ctx, chartArea: { left, top, right, bottom } } = chart;
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.font = "16px 'Poppins'";
+          ctx.fillStyle = '#99a3b8';
+          ctx.fillText('No hay datos para graficar', left + (right - left) / 2, top + (bottom - top) / 2);
+          ctx.restore();
+        }
+      }
+    };
+    Chart.register(noDataPlugin);
+
+    function parseNumericLike(v) { if (v === null || v === undefined) return NaN; if (typeof v === 'number') return v; const s = String(v).trim().replace(/,/g, '.'); return s === '' ? NaN : Number(s); }
+    function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+    function percentile(sorted, p) { if (!sorted || sorted.length === 0) return NaN; if (p <= 0) return sorted[0]; if (p >= 100) return sorted[sorted.length - 1]; const rank = (p / 100) * (sorted.length - 1); const lower = Math.floor(rank); const upper = Math.ceil(rank); const weight = rank - lower; return upper === lower ? sorted[lower] : sorted[lower] * (1 - weight) + sorted[upper] * weight; }
+
+    async function loadDataAndInitialize() {
+      try {
+        const resp = await fetch('data.xlsx');
+        if (!resp.ok) throw new Error(`HTTP status ${resp.status}`);
+        processWorkbook(await resp.arrayBuffer());
+      } catch (err) {
+        dataTableContainer.innerHTML = `<p class="small error">No se cargó data.xlsx: ${err.message}. Usa el botón para seleccionar un archivo.</p>`;
+        clearDashboard();
+      }
+    }
+    function processWorkbook(arrayBuffer) {
+      try {
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        allData = XLSX.utils.sheet_to_json(ws, { defval: null }).map(r => Object.fromEntries(Object.entries(r).map(([k, v]) => [String(k).trim(), v])));
+        if (allData.length === 0) throw new Error('El archivo está vacío.');
+        headers = Object.keys(allData[0]);
+        populateSelects();
+        renderFilteredDataTable(allData);
+        clearDashboard();
+      } catch (e) {
+        dataTableContainer.innerHTML = `<p class="small error">Error al leer el archivo: ${e.message}</p>`;
+      }
+    }
+    fileInput.addEventListener('change', e => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = ev => processWorkbook(ev.target.result); reader.readAsArrayBuffer(file); } });
+
+    function populateSelects() { [analysisColumnSelect, groupByColumnSelect].forEach(select => { select.innerHTML = `<option value="">-- Elige una columna --</option>`; headers.forEach(h => { const opt = document.createElement('option'); opt.value = h; opt.innerHTML = escapeHtml(h); select.appendChild(opt); }); }); }
+    function updateFilterValueSelect() { const groupBy = groupByColumnSelect.value; filterValueContainer.style.display = groupBy ? 'block' : 'none'; if (!groupBy) return; const unique = [...new Set(allData.map(r => r[groupBy]).filter(v => v != null))]; unique.sort((a,b) => String(a).localeCompare(String(b), undefined, {numeric: true})); filterValueSelect.innerHTML = `<option value="todos">Todos</option>` + unique.map(v => { const safe = escapeHtml(v === null || v === undefined ? '' : v); return `<option value="${safe}">${safe}</option>`; }).join(''); filterValueLabel.textContent = `Filtrar por "${groupBy}"`; }
+
+    function runAnalysis() {
+        const analysisCol = analysisColumnSelect.value;
+        if (!analysisCol) { alert('Por favor, selecciona una columna para analizar.'); return; }
+        const groupBy = groupByColumnSelect.value;
+        const filterVal = filterValueSelect.value;
+        let filteredData = (groupBy && filterVal !== 'todos') ? allData.filter(r => String(r[groupBy]) === String(filterVal)) : allData;
+        updateDashboard(filteredData, analysisCol, groupBy, filterVal);
+    }
+
+    function clearDashboard() {
+        analysisColumnSelect.value=''; groupByColumnSelect.value='';
+        filterValueContainer.style.display = 'none'; binControlsContainer.style.display = 'none';
+        ordinalControlsContainer.style.display = 'none';
+        binCountInput.value = '';
+        const defaultText='Selecciona una columna para ver resultados.';
+        statsGrid.innerHTML=`<div class="card"><p class="small">${defaultText}</p></div>`;
+        extendedStats.innerHTML='';
+        frequencyTableBody.innerHTML=`<tr><td colspan="5">${defaultText}</td></tr>`;
+        [statsColumnName, freqColumnName, histogramChartTitle].forEach(el => el.textContent = 'N/A');
+        
+        barChartWrapper.style.display = 'block';
+        pieChartWrapper.style.display = 'block';
+        histogramWrapper.style.display = 'block';
+        gaussWrapper.style.display = 'block';
+        frequencyChartWrapper.style.display = 'block';
+
+        destroyCharts();
+        createOrUpdateChart('histogram', 'histogram-chart', 'bar', { labels: [], datasets: [] });
+        createOrUpdateChart('gauss', 'gauss-chart', 'line', { labels: [], datasets: [] });
+        createOrUpdateChart('pie', 'pie-chart', 'pie', { labels: [], datasets: [] });
+        createOrUpdateChart('bar', 'bar-chart', 'bar', { labels: [], datasets: [] });
+        createOrUpdateChart('frequency', 'frequency-chart', 'line', { labels: [], datasets: [] });
+    }
+
+    function isColumnNumeric(data, col) { const values = data.map(r => r[col]).filter(v => v != null); if (values.length === 0) return false; const numericCount = values.map(parseNumericLike).filter(isFinite).length; return (numericCount / values.length) >= 0.8; }
+    function updateDashboard(data, analysisCol, groupByCol, filterVal) {
+        const isNumeric = isColumnNumeric(data, analysisCol);
+        
+        let title = analysisCol || 'N/A';
+        if (groupByCol && filterVal && filterVal !== 'todos') { title += ` (Filtro: ${filterVal})`; }
+        [statsColumnName, freqColumnName, histogramChartTitle].forEach(el => el.textContent = title);
+        
+        binControlsContainer.style.display = isNumeric ? 'block' : 'none';
+        
+        ordinalControlsContainer.style.display = !isNumeric && analysisCol ? 'block' : 'none';
+        if (!isNumeric && analysisCol) {
+            setupOrdinalControls(data, analysisCol);
+        }
+
+        renderStats(data, analysisCol, isNumeric);
+        renderFrequencyTable(data, analysisCol, isNumeric);
+        renderCharts(data, analysisCol, groupByCol, filterVal, isNumeric);
+    }
+
+
+    function renderStats(data, col, isNumeric) {
+        const valuesRaw = data.map(r=>r[col]).filter(v=> v != null);
+        statsGrid.innerHTML=''; extendedStats.innerHTML='';
+        if(valuesRaw.length===0){ statsGrid.innerHTML='<div class="card"><p class="small">No hay datos.</p></div>'; return; }
+        statsGrid.innerHTML = `<div class="card"><h4>Recuento</h4><div class="stat-value">${valuesRaw.length}</div></div>`;
+        if(isNumeric){
+            const nums = valuesRaw.map(parseNumericLike).filter(isFinite);
+            if(nums.length === 0) return;
+            const sorted = [...nums].sort((a,b)=>a-b);
+            const mean = nums.reduce((a,b)=>a+b,0)/nums.length;
+            const sd = nums.length > 1 ? Math.sqrt(nums.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (nums.length - 1)) : 0;
+            const q2 = percentile(sorted, 50);
+
+            // DECILES
+            const decilePercents = [10,20,30,40,50,60,70,80,90];
+            const deciles = decilePercents.map(p => percentile(sorted, p));
+
+            statsGrid.innerHTML += `
+                <div class="card"><h4>Media</h4><div class="stat-value">${Number.isFinite(mean) ? mean.toFixed(2) : 'N/A'}</div><p class="small">Desv. Est: ${sd.toFixed(2)}</p></div>
+                <div class="card"><h4>Mediana (Q2)</h4><div class="stat-value">${Number.isFinite(q2) ? q2.toFixed(2) : 'N/A'}</div><p class="small">Mín: ${sorted[0]} / Máx: ${sorted[sorted.length-1]}</p></div>`;
+
+            // Extended stats: Q1,Q3 y DECILES
+            extendedStats.innerHTML = `<table><thead><tr><th>Medida</th><th>Valor</th></tr></thead><tbody>
+                <tr><td>Q1 (Percentil 25)</td><td>${percentile(sorted, 25).toFixed(4)}</td></tr>
+                <tr><td>Mediana (Q2)</td><td>${percentile(sorted, 50).toFixed(4)}</td></tr>
+                <tr><td>Q3 (Percentil 75)</td><td>${percentile(sorted, 75).toFixed(4)}</td></tr>` +
+                decilePercents.map((p,i)=>`<tr><td>D${i+1} (p=${p}%)</td><td>${Number.isFinite(deciles[i])?deciles[i].toFixed(4):'N/A'}</td></tr>`).join('') +
+                `</tbody></table>`;
+        } else {
+            const counts = valuesRaw.reduce((acc, v) => { acc[v] = (acc[v] || 0) + 1; return acc; }, {});
+            const sortedCounts = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            statsGrid.innerHTML += `<div class="card"><h4>Categorías Únicas</h4><div class="stat-value">${sortedCounts.length}</div><p class="small">Moda: ${escapeHtml(sortedCounts[0][0])}</p></div>`;
+            extendedStats.innerHTML = '';
+        }
+    }
+    
+    function renderFrequencyTable(data, col, isNumeric, orderMap = null) {
+        const values = data.map(r => r[col]).filter(v => v != null);
+        frequencyTableBody.innerHTML = ''; freqTableHeader.textContent = col;
+        if (values.length === 0) {
+            frequencyTableBody.innerHTML = `<tr><td colspan="5">No hay datos.</td></tr>`; return;
+        }
+        const counts = values.reduce((acc, v) => { acc[v] = (acc[v] || 0) + 1; return acc; }, {});
+        
+        let sorted;
+        if (orderMap) {
+            sorted = Object.entries(counts).sort((a,b) => orderMap[a[0]] - orderMap[b[0]]);
+        } else {
+            sorted = Object.entries(counts).sort(isNumeric ? (a,b) => parseNumericLike(a[0]) - parseNumericLike(b[0]) : (a,b) => String(a[0]).localeCompare(String(b[0])));
+        }
+
+        let cumulativeFreq = 0, cumulativeRel = 0;
+        frequencyTableBody.innerHTML = sorted.map(([value, freq]) => {
+            const relFreq = (freq / values.length) * 100;
+            cumulativeFreq += freq; cumulativeRel += relFreq;
+            return `<tr><td>${escapeHtml(value)}</td><td>${freq}</td><td>${cumulativeFreq}</td><td>${relFreq.toFixed(2)}%</td><td>${cumulativeRel.toFixed(2)}%</td></tr>`;
+        }).join('');
+    }
+    
+    function renderFilteredDataTable(data) { if (!data || data.length === 0) { dataTableContainer.innerHTML = '<p class="small">Carga un archivo para ver los datos.</p>'; return; } const table = `<table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${data.slice(0, 100).map(row => `<tr>${headers.map(h => `<td>${escapeHtml(row[h] ?? '')}</td>`).join('')}</tr>`).join('')}</tbody></table>`; dataTableContainer.innerHTML = table; }
+    function destroyCharts() { Object.values(chartInstances).forEach(chart => { if (chart) try{ chart.destroy(); }catch(e){} }); }
+    function gaussianPdf(x, mean, sd) { return sd <= 0 ? 0 : (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * ((x - mean) / sd) ** 2); }
+
+function renderCharts(data, analysisCol, groupByCol, filterVal, isNumeric) {
+    destroyCharts();
+    if (!analysisCol) return;
+    const values = data.map(r => r[analysisCol]).filter(v => v != null);
+
+    if (values.length === 0) {
+        histogramWrapper.style.display = 'block';
+        gaussWrapper.style.display = 'block';
+        barChartWrapper.style.display = 'block';
+        pieChartWrapper.style.display = 'block';
+        frequencyChartWrapper.style.display = 'block';
+        createOrUpdateChart('histogram', 'histogram-chart', 'bar', { labels: [], datasets: [] });
+        createOrUpdateChart('gauss', 'gauss-chart', 'line', { labels: [], datasets: [] });
+        createOrUpdateChart('pie', 'pie-chart', 'pie', { labels: [], datasets: [] });
+        createOrUpdateChart('bar', 'bar-chart', 'bar', { labels: [], datasets: [] });
+        createOrUpdateChart('frequency', 'frequency-chart', 'line', { labels: [], datasets: [] });
+        return;
+    }
+
+    if (isNumeric) {
+        histogramWrapper.style.display = 'block';
+        gaussWrapper.style.display = 'block';
+        pieChartWrapper.style.display = 'block';
+        barChartWrapper.style.display = 'none';
+        frequencyChartWrapper.style.display = 'block';
+
+        const nums = values.map(parseNumericLike).filter(isFinite);
+        if (nums.length === 0) {
+            createOrUpdateChart('histogram', 'histogram-chart', 'bar', { labels: [], datasets: [] });
+            createOrUpdateChart('gauss', 'gauss-chart', 'line', { labels: [], datasets: [] });
+            createOrUpdateChart('pie', 'pie-chart', 'pie', { labels: [], datasets: [] });
+            createOrUpdateChart('frequency', 'frequency-chart', 'line', { labels: [], datasets: [] });
+            return;
+        }
+        
+        const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+        const sd = nums.length > 1 ? Math.sqrt(nums.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (nums.length - 1)) : 0;
+        const min = Math.min(...nums);
+        const max = Math.max(...nums);
+
+        const userBinCount = parseInt(binCountInput.value, 10);
+        const k = isNaN(userBinCount) || userBinCount < 2 ? Math.ceil(1 + 3.322 * Math.log10(nums.length)) : userBinCount;
+        const binWidth = (max - min) / k || 1;
+        
+        const bins = Array.from({ length: k }, (_, i) => min + i * binWidth);
+        const labels = bins.map((b, i) => `${b.toFixed(2)} - ${(b + binWidth).toFixed(2)}`);
+        const counts = Array(k).fill(0);
+        
+        for (const num of nums) {
+            let binIndex = Math.floor((num - min) / binWidth);
+            if (binIndex >= k) binIndex = k - 1;
+            if (binIndex < 0) binIndex = 0;
+            counts[binIndex]++;
+        }
+
+        // Histograma (barras)
+        createOrUpdateChart('histogram', 'histogram-chart', 'bar', {
+            labels: labels,
+            datasets: [{
+                label: 'Frecuencia',
+                data: counts,
+                backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 1
+            }]
+        }, {
+            scales: {
+                x: { title: { display: true, text: analysisCol } },
+                y: { title: { display: true, text: 'Frecuencia' }, beginAtZero: true }
+            },
+            plugins: { legend: { display: false } }
+        });
+
+        // Curva de Gauss (line) en canvas separado — escalada a conteo
+        const normalCurve = bins.map(b => {
+            const x = b + binWidth / 2;
+            const pdfValue = gaussianPdf(x, mean, sd);
+            return pdfValue * nums.length * binWidth;
+        });
+        createOrUpdateChart('gauss', 'gauss-chart', 'line', {
+          labels: labels,
+          datasets: [{
+            label: 'Curva Normal (ajustada a conteos)',
+            data: normalCurve,
+            fill: false,
+            borderColor: '#8e44ad',
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            pointRadius: 2
+          }]
+        }, {
+          scales: {
+            x: { title: { display: true, text: analysisCol } },
+            y: { title: { display: true, text: 'Frecuencia (escala)' }, beginAtZero: true }
+          },
+          plugins: { legend: { display: false } }
+        });
+
+        // Pastel: proporción por bin (porcentajes)
+        const total = counts.reduce((a,b)=>a+b,0) || 1;
+        const percents = counts.map(c => Math.round((c/total)*10000)/100); // 2 decimales
+        createOrUpdateChart('pie', 'pie-chart', 'pie', {
+            labels,
+            datasets: [{
+                label: 'Porcentaje por bin (%)',
+                data: percents,
+                backgroundColor: [
+                    'rgba(0, 123, 255, 0.7)','rgba(142, 68, 173, 0.7)','rgba(40, 167, 69, 0.7)',
+                    'rgba(220, 53, 69, 0.7)','rgba(255, 193, 7, 0.7)','rgba(23, 162, 184, 0.7)',
+                    'rgba(108, 117, 125, 0.7)'
+                ]
+            }]
+        }, {
+            plugins: { legend: { position: 'right' } },
+        });
+
+        // Gráfica de frecuencia: ahora DOS LÍNEAS (sin barras)
+        const cumulative = [];
+        let cum = 0;
+        for (let i=0;i<counts.length;i++){ cum += counts[i]; cumulative.push(Math.round((cum/total)*10000)/100); }
+        createOrUpdateChart('frequency', 'frequency-chart', 'line', {
+          labels,
+          datasets: [
+            { label: 'Frecuencia Absoluta', data: counts, borderColor: 'rgba(0, 123, 255, 0.9)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y' },
+            { label: '% Acumulado', data: cumulative, borderColor: '#8e44ad', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+          ]
+        }, {
+          scales: {
+            y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Frecuencia' }, beginAtZero: true },
+            y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: '% Acumulado' }, beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+          },
+          plugins: { tooltip: { callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + ctx.formattedValue + (ctx.dataset === undefined ? '' : (ctx.dataset.label && ctx.dataset.label.includes('%') ? '%' : ctx.dataset.label.includes('Acumulado') ? '%' : '')); } } } }
+        });
+
+    } else {
+        histogramWrapper.style.display = 'none';
+        gaussWrapper.style.display = 'none';
+        barChartWrapper.style.display = 'block';
+        pieChartWrapper.style.display = 'block';
+        frequencyChartWrapper.style.display = 'block';
+
+        const counts = values.reduce((acc, v) => { acc[v] = (acc[v] || 0) + 1; return acc; }, {});
+        const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        const labels = sorted.map(e => e[0]);
+        const dataValues = sorted.map(e => e[1]);
+
+        const chartColors = [
+            'rgba(0, 123, 255, 0.7)', 'rgba(142, 68, 173, 0.7)', 'rgba(40, 167, 69, 0.7)', 
+            'rgba(220, 53, 69, 0.7)', 'rgba(255, 193, 7, 0.7)', 'rgba(23, 162, 184, 0.7)',
+            'rgba(108, 117, 125, 0.7)'
+        ];
+
+        let title = analysisCol;
+        if (groupByCol && filterVal && filterVal !== 'todos') {
+            title += ` (para ${filterVal})`;
+        }
+        barChartTitleContainer.textContent = `Distribución de ${title}`;
+        pieChartTitleContainer.textContent = `Composición de ${title}`;
+        
+        createOrUpdateChart('bar', 'bar-chart', 'bar', {
+            labels,
+            datasets: [{
+                label: 'Frecuencia',
+                data: dataValues,
+                backgroundColor: chartColors
+            }]
+        }, {
+            indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { title: { display: true, text: 'Conteo' } } }
+        });
+
+        createOrUpdateChart('pie', 'pie-chart', 'pie', {
+            labels,
+            datasets: [{
+                label: 'Distribución',
+                data: dataValues,
+                backgroundColor: chartColors
+            }]
+        }, {
+            plugins: { legend: { position: 'right' } }
+        });
+
+        // Gráfica de frecuencia ahora DOS LÍNEAS (sin barras)
+        const total = dataValues.reduce((a,b)=>a+b,0) || 1;
+        const cumulative = [];
+        let cum2 = 0;
+        for (let i=0;i<dataValues.length;i++){ cum2 += dataValues[i]; cumulative.push(Math.round((cum2/total)*10000)/100); }
+        createOrUpdateChart('frequency', 'frequency-chart', 'line', {
+          labels,
+          datasets: [
+            { label: 'Frecuencia Absoluta', data: dataValues, borderColor: 'rgba(0, 123, 255, 0.9)', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y' },
+            { label: '% Acumulado', data: cumulative, borderColor: '#8e44ad', backgroundColor: 'transparent', tension: 0.3, pointRadius: 3, yAxisID: 'y1' }
+          ]
+        }, {
+          scales: {
+            y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Frecuencia' }, beginAtZero: true },
+            y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: '% Acumulado' }, beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } }
+          },
+          plugins: { tooltip: { callbacks: { label: function(ctx){ return ctx.dataset.label + ': ' + ctx.formattedValue + (ctx.dataset === undefined ? '' : (ctx.dataset.label && ctx.dataset.label.includes('%') ? '%' : ctx.dataset.label.includes('Acumulado') ? '%' : '')); } } } }
+        });
+    }
+}
+    function createOrUpdateChart(id, canvasId, type, data, options = {}) { const canvas = document.getElementById(canvasId); if(!canvas) return; const ctx = canvas.getContext('2d'); if (chartInstances[id] && typeof chartInstances[id].destroy === 'function') { try { chartInstances[id].destroy(); } catch(e) {} } const defaultOptions = { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }; chartInstances[id] = new Chart(ctx, { type, data, options: {...defaultOptions, ...options}, plugins: [noDataPlugin] }); }
+
+    function setupOrdinalControls(data, col) {
+        const uniqueValues = [...new Set(data.map(r => r[col]).filter(v => v != null))];
+        ordinalCategoriesContainer.innerHTML = '';
+        
+        if (uniqueValues.length > 15) { // Evita sobrecargar la UI
+             ordinalCategoriesContainer.innerHTML = '<p class="small">Demasiadas categorías únicas para ordenar manualmente.</p>';
+             calculateOrdinalBtn.style.display = 'none';
+             return;
+        }
+        calculateOrdinalBtn.style.display = 'block';
+
+        uniqueValues.sort().forEach(val => {
+            const catEl = document.createElement('div');
+            catEl.className = 'draggable-category';
+            catEl.draggable = true;
+            catEl.textContent = val;
+            ordinalCategoriesContainer.appendChild(catEl);
+        });
+    }
+
+    ordinalCategoriesContainer.addEventListener('dragstart', e => {
+        if (e.target.classList.contains('draggable-category')) {
+            e.target.classList.add('dragging');
+        }
+    });
+
+    ordinalCategoriesContainer.addEventListener('dragend', e => {
+        if (e.target.classList.contains('draggable-category')) {
+            e.target.classList.remove('dragging');
+        }
+    });
+
+    ordinalCategoriesContainer.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(ordinalCategoriesContainer, e.clientX);
+        const dragging = document.querySelector('.dragging');
+        if (afterElement == null) {
+            ordinalCategoriesContainer.appendChild(dragging);
+        } else {
+            ordinalCategoriesContainer.insertBefore(dragging, afterElement);
+        }
+    });
+
+    function getDragAfterElement(container, x) {
+        const draggableElements = [...container.querySelectorAll('.draggable-category:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function calculateAndRenderOrdinalStats() {
+        const analysisCol = analysisColumnSelect.value;
+        if (!analysisCol) return;
+
+        const orderedCategories = [...ordinalCategoriesContainer.querySelectorAll('.draggable-category')].map(el => el.textContent);
+        const orderMap = orderedCategories.reduce((acc, cat, index) => {
+            acc[cat] = index + 1;
+            return acc;
+        }, {});
+
+        const groupBy = groupByColumnSelect.value;
+        const filterVal = filterValueSelect.value;
+        let filteredData = (groupBy && filterVal !== 'todos') ? allData.filter(r => String(r[groupBy]) === String(filterVal)) : allData;
+        const stats = getOrdinalStats(filteredData, analysisCol, orderMap);
+      
+        if (stats) {
+            extendedStats.innerHTML = `
+                <h4>Estadísticas Ordinales (Basado en tu orden)</h4>
+                <table><thead><tr><th>Medida</th><th>Valor</th></tr></thead><tbody>
+                    <tr><td>Q1 (Percentil 25)</td><td>${escapeHtml(stats.q1)}</td></tr>
+                    <tr><td>Mediana (Q2)</td><td>${escapeHtml(stats.q2)}</td></tr>
+                    <tr><td>Q3 (Percentil 75)</td><td>${escapeHtml(stats.q3)}</td></tr>` +
+                    stats.deciles.map((d,i)=>`<tr><td>D${i+1} (p=${(i+1)*10}%)</td><td>${escapeHtml(d)}</td></tr>`).join('') +
+                `</tbody></table>`;
+        } else {
+            extendedStats.innerHTML = '<p class="small error">No se pudieron calcular las estadísticas ordinales.</p>';
+        }
+
+        renderFrequencyTable(filteredData, analysisCol, false, orderMap);
+    }
+
+    function getOrdinalStats(data, col, orderMap) {
+        const valuesRaw = data.map(r => r[col]).filter(v => v != null && orderMap[v] !== undefined);
+        if (valuesRaw.length === 0) return null;
+
+        const numericValues = valuesRaw.map(v => orderMap[v]).sort((a, b) => a - b);
+        const n = numericValues.length;
+
+        const posQ1 = Math.ceil(0.25 * (n + 1));
+        const posQ2 = Math.ceil(0.50 * (n + 1));
+        const posQ3 = Math.ceil(0.75 * (n + 1));
+
+        const valQ1 = numericValues[posQ1 - 1];
+        const valQ2 = numericValues[posQ2 - 1];
+        const valQ3 = numericValues[posQ3 - 1];
+        
+        const inverseMap = Object.fromEntries(Object.entries(orderMap).map(([k, v]) => [v, k]));
+
+        // Deciles (posición entera similar a Q)
+        const deciles = [];
+        for (let i=1;i<=9;i++){
+          const pos = Math.ceil((i*10/100) * (n + 1));
+          const val = numericValues[Math.max(0, pos-1)];
+          deciles.push(inverseMap[val] || '');
+        }
+
+        return {
+            q1: inverseMap[valQ1] || '',
+            q2: inverseMap[valQ2] || '',
+            q3: inverseMap[valQ3] || '',
+            deciles
+        };
+    }
+    groupByColumnSelect.addEventListener('change', updateFilterValueSelect);
+    applyFiltersBtn.addEventListener('click', runAnalysis);
+    clearFiltersBtn.addEventListener('click', clearDashboard);
+    calculateOrdinalBtn.addEventListener('click', calculateAndRenderOrdinalStats); // NUEVO
+    
+    loadDataAndInitialize();
+  });
+
+// ---------- NAV: inicializar comportamiento del hamburger después de que el DOM esté listo ----------
+document.addEventListener('DOMContentLoaded', () => {
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (!hamburger || !mobileMenu) return;
+
+  const openMenu = () => {
+    mobileMenu.classList.add('open');
+    hamburger.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('menu-open');
+    const first = mobileMenu.querySelector('a');
+    if (first) first.focus();
+  };
+
+  const closeMenu = () => {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('menu-open');
+    hamburger.focus();
+  };
+
+  hamburger.addEventListener('click', (e) => {
+    const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+    if (expanded) closeMenu(); else openMenu();
+  });
+
+  // cerrar con Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+      closeMenu();
+    }
+  });
+
+  // cerrar al hacer clic fuera del menú y fuera de la barra
+  document.addEventListener('click', (e) => {
+    const bar = document.querySelector('.bar');
+    const isInside = mobileMenu.contains(e.target) || hamburger.contains(e.target) || (bar && bar.contains(e.target));
+    if (!isInside && mobileMenu.classList.contains('open')) closeMenu();
+  });
+
+  // enfoque básico cuando el menú está abierto
+  document.addEventListener('focusin', (e) => {
+    if (!mobileMenu.classList.contains('open')) return;
+    if (mobileMenu.contains(e.target) || hamburger.contains(e.target)) return;
+    const first = mobileMenu.querySelector('a');
+    if (first) first.focus();
+  }, true);
+});
+
+
+  </script>
+</body>
+</html>

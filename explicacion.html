@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentos de Estadística - Guía Interactiva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Playfair+Display:wght@400;600;700&display=swap');
+
+/* --- 1. ANIMACIONES --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeInContent {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Agregada nuestra animación de luces */
+@keyframes pulseLights {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+/* --- 2. PALETA DE COLORES "MODERNO / VINTAGE" REEMPLAZADA --- */
+:root{
+ --bg-dark-1: #0f1720;
+ --bg-dark-2: #17232b;
+ --accent: #8db4d8;  /* cool blue */
+ --accent-rgb: 141, 180, 216;
+ --accent-2: #d6b57b;  /* vintage gold */
+ --accent-2-rgb: 214, 181, 123;
+ --muted: #9fb4c6;
+ --glass-blur: 14px;
+ --card-bg-glass: rgba(255, 255, 255, 0.04);
+ --card-bg-solid: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01));
+ --card-border: rgba(255, 255, 255, 0.06);
+ --glass-saturate: 110%; /* Ajustado a nuestro valor */
+ --text: #eef6fb;
+ --text-2: #d8e8f5;
+ --shadow: 0 18px 50px rgba(2, 8, 20, 0.55);
+ --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.04"/></svg>');
+ 
+ /* Mapeo de variables (el CSS de abajo usará estas) */
+ --bg-base: var(--bg-dark-1);
+ --card: var(--card-bg-glass); /* Mapeado a nuestro fondo de cristal */
+ --border-color: var(--card-border);
+ --shadow-color: var(--shadow);
+ --accent1: var(--accent); /* Naranja -> Azul */
+ --accent2: var(--accent-2); /* Dorado -> Dorado (ya coincide) */
+ --accent3: #4a6c8c;   /* Naranja oscuro -> Azul oscuro (para gradientes) */
+}
+
+:root.light {
+  --bg-dark-1: #f6f9fb;
+  --bg-dark-2: #eef6fb;
+  --accent: #3760b5;
+  --accent-rgb: 55, 96, 181;
+  --accent-2: #c69f5a;
+  --accent-2-rgb: 198, 159, 90;
+  --muted: #46627f;
+
+  /* --- Variables añadidas --- */
+  --glass-blur: 14px; /* Mantenido del tema oscuro */
+  --card-bg-solid: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.01)); /* Renombrado desde --card-bg */
+  --glass-saturate: 110%; /* Mantenido del tema oscuro */
+  --accent3: #2a4a8c;  /* Azul oscuro para gradientes (versión light) */
+  /* --- Fin de variables añadidas --- */
+
+  --card-bg-glass: rgba(17, 24, 39, 0.03);
+  --card-border: rgba(2, 8, 20, 0.06);
+  --text: #10202b;
+  --text-2: #163247;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+  --grain: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><filter id="n"><feTurbulence baseFrequency="0.6" numOctaves="1" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.02"/></svg>');
+  
+  /* --- Mapeo de variables (completado y corregido) --- */
+  --bg-base: var(--bg-dark-1);
+  --card: var(--card-bg-glass);
+  --border-color: var(--card-border);
+  --shadow-color: var(--shadow); /* Corregido: Ahora mapea a la variable --shadow */
+  --accent1: var(--accent);
+  --accent2: var(--accent-2);
+  --accent3: var(--accent3); /* Mapeado al nuevo --accent3 */
+  --text-primary: var(--text);
+  --text-secondary: var(--muted);
+}
+
+
+/* --- 3. FONDO DEL BODY REEMPLAZADO --- */
+body{
+ margin:0;
+ font-family:'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif;
+ background-color: var(--bg-base); /* Color base sólido */
+ background-repeat: no-repeat;
+ background-attachment: fixed;
+ -webkit-font-smoothing:antialiased;
+ -moz-osx-font-smoothing:grayscale;
+ display:flex;
+ align-items:flex-start;
+ justify-content:center;
+ padding: 115px 20px 50px 20px; 
+ min-height: 100vh;
+ overflow-y: scroll;
+ overflow-x: hidden; /* Añadido para las luces */
+ position: relative; /* Añadido para las luces */
+ color: var(--text);
+}
+
+/* 4. LUCES PULSANTES Y GRANO AÑADIDOS */
+body::before {
+ content: '';
+ position: fixed;
+ inset: 0;
+ pointer-events: none;
+ z-index: -2; /* Detrás de todo */
+ background-image: 
+  radial-gradient(ellipse 60% 80% at -10% 10%, rgba(var(--accent-rgb), 0.4), transparent 60%),
+  radial-gradient(ellipse 50% 70% at 90% 90%, rgba(var(--accent-rgb), 0.15), transparent 70%);
+ background-repeat: no-repeat;
+ animation: pulseLights 6s ease-in-out infinite;
+}
+body::after{
+ content:''; 
+ position:fixed; 
+ inset:0; 
+ pointer-events:none; 
+ mix-blend-mode:overlay;
+ background-image: var(--grain);
+ z-index: -1; /* Encima de las luces, detrás del contenido */
+ opacity: 0.5;
+}
+
+
+/* === NAV: fijo y sin estirarse ni cambiar color entero === */
+nav.topbar{
+ position: fixed;
+ top: 0; left: 0; right: 0;
+ height: 72px;
+ z-index: 1200;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding: 8px 12px;
+}
+
+/* la .bar debe tener máximo ancho y no forzar crecimiento */
+nav.topbar .bar{
+ max-width: 1200px;
+ width: calc(100% - 48px);      /* deja espacio lateral en pantallas pequeñas */
+ height: 56px;
+ margin: 8px 0;
+ border-radius: 14px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:8px 18px;
+ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+ backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+ -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+ box-shadow: var(--shadow);
+ border:1px solid var(--card-border);
+ box-sizing: border-box;
+ flex: 0 1 auto; /* evita que crezca indebidamente */
+}
+
+/* Brand: logo con tamaño fijo para no estirar nav */
+.brand { display:flex; align-items:center; gap:12px; min-width: 0; }
+.brand .logo{
+ width:44px;
+ height:44px;
+ flex: 0 0 44px;                    /* tamaño fijo, no se expande */
+ border-radius:10px;
+ display:grid;
+ place-items:center;
+ background: linear-gradient(135deg, var(--accent2), rgba(255,255,255,0.06));
+ color: var(--text);
+ font-weight:700;
+ font-family:'Playfair Display', serif;
+}
+
+/* nombre y subtitulo */
+.brand h4{ margin:0; font-family:'Playfair Display', serif; font-size:1.05rem; letter-spacing:0.6px; color:var(--text-2); }
+.brand p{ margin:0; font-size:0.78rem; color:var(--muted); }
+
+/* controls */
+.controls{ display:flex; align-items:center; gap:10px; flex-shrink: 0; }
+.btn{ background:transparent; border:1px solid var(--card-border); color:var(--muted); padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600 }
+.btn:hover{ transform:translateY(-2px); }
+.icon{ width:20px; height:20px; display:inline-block; vertical-align:middle }
+
+.sheet{
+ width:min(1400px,96vw);
+ background: var(--card); /* Ya usa --card-bg-glass */
+ border-radius:30px;
+ padding: 40px;
+ -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+ backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+ box-shadow: var(--shadow); /* Sombra ajustada */
+ position:relative;
+ border:1px solid var(--border-color); /* Borde ajustado */
+ animation: fadeIn 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+ margin: 50px 0;
+  z-index: 10; /* Asegura que esté sobre el fondo */
+}
+
+.header{
+ text-align:center;
+ margin-bottom:40px;
+ padding-bottom: 25px;
+ border-bottom: 1px solid var(--border-color);
+}
+.title{
+ font-family:'Playfair Display',serif;font-size:3.2rem;line-height:1.1;
+ color: var(--text-2); /* Ajustado a nuestro texto más claro */
+ font-weight:700;
+}
+.subtitle{font-style:italic;color:var(--muted);font-size:1.15rem;max-width: 700px; margin: 12px auto 0 auto;}
+
+.page-layout {
+ display: grid;
+ grid-template-columns: 280px 1fr;
+ gap: 45px;
+}
+
+/* --- 5. ESTILO DE SIDEBAR REEMPLAZADO --- */
+.sidebar {
+ position: sticky;
+ top: 115px; /* Ajustado al padding del body */
+ align-self: start;
+}
+.sidebar-nav{list-style:none; padding:12px; margin:0; background:transparent}
+.sidebar-nav a{
+ display:block; text-decoration:none; color:var(--muted); 
+ padding:12px 14px; border-radius:10px; margin-bottom:8px; 
+ font-weight:600; transition:all .22s; 
+ border-left:4px solid transparent;
+ font-size: 0.95rem; /* Tamaño de fuente conservado */
+}
+.sidebar-nav a:hover{
+ color:var(--text); 
+ transform:translateX(6px); 
+ background:var(--card-bg-solid); 
+ border-left-color:var(--accent);
+}
+.sidebar-nav a.active{
+ color:var(--accent); 
+ background:var(--card-bg-solid); 
+ border-left-color:var(--accent);
+ font-weight: 600;
+}
+
+
+.main-content { min-width: 0; }
+.content-section { display: none; }
+.content-section.active {
+ display: block; animation: fadeInContent 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+/* --- 6. COLORES DE SECCIÓN AJUSTADOS --- */
+.content-section h2 {
+ font-family: 'Playfair Display', serif; font-size: 2.2rem; 
+ color: var(--accent1); /* Azul */
+ text-shadow: none; /* Sombra naranja eliminada */
+ margin-top: 0; margin-bottom: 20px; padding-bottom: 10px;
+ border-bottom: 1px solid var(--border-color);
+}
+.content-section h3 {
+ font-size: 1.4rem; 
+ color: var(--accent2); /* Dorado */
+ font-weight: 600;
+ margin-top: 30px; margin-bottom: 15px;
+}
+/* Agregado para h4, para que coincida con nuestro estilo de sub-sección */
+.content-section h4 {
+ font-size: 1.15rem;
+ color: var(--accent2); /* Dorado */
+ font-weight: 600;
+ margin-top: 25px; margin-bottom: 10px;
+}
+.content-section p, .content-section ul, .content-section ol {
+ font-size: 1.05rem; color: var(--text); line-height: 1.8; max-width: 80ch;
+}
+.content-section ul, .content-section ol { padding-left: 25px; }
+.content-section li { margin-bottom: 10px; }
+
+/* .info-box ajustado a nuestro estilo .highlight-block */
+.info-box {
+ background: rgba(var(--accent-rgb), 0.1); /* Fondo azulado */
+ border-left: 4px solid var(--accent1); /* Borde azul */
+ padding: 20px 25px; border-radius: 12px; margin: 25px 0;
+}
+.info-box h3 { margin-top: 0; color: var(--accent1); } /* Azul */
+
+#quiz-container, #quiz-results-container { margin-top: 30px; }
+.quiz-card {
+ background-color: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+ border-radius: 15px; padding: 25px; margin-bottom: 20px; transition: all 0.2s ease;
+}
+.quiz-question { font-size: 1.2rem; font-weight: 600; margin: 0 0 20px 0; color: var(--text); }
+.quiz-options { display: flex; flex-direction: column; gap: 12px; }
+.quiz-option {
+ background-color: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px;
+ cursor: pointer; transition: all 0.2s ease; border: 2px solid transparent; position: relative;
+ color: var(--text); /* Asegura color de texto */
+}
+.quiz-option:hover {
+ transform: scale(1.02); background-color: rgba(255,255,255,0.08); 
+ border-color: var(--accent1); /* Borde azul */
+}
+.quiz-option.correct {
+ background-color: rgba(46, 204, 113, 0.18); border-color: #2ecc71; color: #2ecc71; font-weight: 600;
+}
+.quiz-option.incorrect {
+ background-color: rgba(231, 76, 60, 0.18); border-color: #e74c3c; color: #e74c3c; font-weight: 600;
+}
+.quiz-option.correct::after, .quiz-option.incorrect::after {
+ position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem;
+}
+.quiz-option.correct::after { content: '✔'; }
+.quiz-option.incorrect::after { content: '✖'; }
+.quiz-options.disabled .quiz-option:not(.correct, .incorrect) {
+ opacity: 0.6; cursor: not-allowed; pointer-events: none;
+}
+.quiz-feedback { margin-top: 15px; font-weight: 500; height: 20px; transition: color 0.3s ease; }
+.quiz-feedback.correct { color: #2ecc71; }
+.quiz-feedback.incorrect { color: #e74c3c; }
+#quiz-results-container {
+ padding: 25px; background-color: rgba(0,0,0,0.08);
+ border-radius: 15px; text-align: center; display: none;
+}
+#quiz-score { font-size: 1.8rem; font-weight: bold; color: var(--accent1); margin: 0 0 20px 0; } /* Azul */
+
+/* Botón de reinicio ajustado a nuestro estilo .btn */
+#quiz-reset-btn {
+ background: transparent;
+ color: var(--muted);
+ border: 1px solid var(--border-color);
+ padding: 12px 25px; font-size: 1rem;
+ font-weight: 600; border-radius: 999px; cursor: pointer;
+ transition: all 0.2s ease;
+ box-shadow: none;
+}
+#quiz-reset-btn:hover {
+ /* Este SÍ "salta" */
+ transform: scale(1.05) translateY(-2px);
+ box-shadow: none;
+ color: var(--text);
+ border-color: var(--accent1); /* Borde azul */
+}
+
+.example-container {
+ background-color: rgba(0,0,0,0.15); border: 1px solid var(--border-color);
+ border-radius: 15px; padding: 25px; margin-top: 30px;
+}
+.example-container h4 {
+ color: var(--accent2); /* Dorado */
+ font-weight: 600; margin-top: 0; margin-bottom: 15px;
+ border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+}
+.raw-data-pills { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; }
+.data-pill {
+ background-color: rgba(255, 255, 255, 0.05); color: var(--muted);
+ padding: 5px 12px; border-radius: 999px; font-family: 'Fira Code', monospace; font-size: 0.9rem;
+}
+.calculation-step { margin-bottom: 15px; font-size: 1.05rem; line-height: 1.8; color: var(--text); }
+.calculation-step strong { color: var(--accent2); font-weight: 600; } /* Dorado */
+
+table.frequency-table {
+ width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem;
+}
+.frequency-table th, .frequency-table td {
+ border: 1px solid var(--border-color); padding: 10px 12px; text-align: center;
+}
+.frequency-table th {
+ background-color: rgba(var(--accent-rgb), 0.1); /* Fondo azul */
+ color: var(--accent1); /* Azul */
+ font-weight: 600;
+}
+.frequency-table td { color: var(--text); }
+.frequency-table tbody tr:nth-child(even) { background-color: rgba(0,0,0,0.1); }
+.visual-grid {
+ display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; margin-top: 25px;
+}
+.histogram-container, .bar-chart-container {
+ background-color: rgba(0,0,0,0.1); border: 1px solid var(--border-color);
+ padding: 20px; border-radius: 10px; height: 350px;
+ display: flex; flex-direction: column;
+}
+.histogram-title, .bar-chart-title {
+ text-align: center; color: var(--accent2); font-weight: 600; margin-bottom: 20px; /* Dorado */
+}
+.histogram-chart, .bar-chart {
+ flex-grow: 1; display: flex; justify-content: space-around; align-items: flex-end;
+ border-left: 2px solid var(--muted); border-bottom: 2px solid var(--muted); position: relative;
+}
+.histogram-chart { gap: 5px; padding-left: 10px; padding-bottom: 5px; }
+.bar-chart { gap: 20px; padding: 0 15px; }
+.histogram-bar, .bar {
+ flex: 1; border-radius: 5px 5px 0 0; position: relative; cursor: pointer; transition: all 0.2s ease;
+}
+/* Colores de barra ajustados */
+.histogram-bar { background-image: linear-gradient(to top, var(--accent3), var(--accent1)); } /* Gradiente azul */
+.bar { width: 100%; background-image: linear-gradient(to top, var(--accent-2), #a1885c); } /* Gradiente dorado */
+
+.histogram-bar:hover, .bar:hover { filter: brightness(1.3); transform: scale(1.05); }
+.histogram-bar .bar-label, .bar .bar-label {
+ position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+ color: var(--muted); width: 100%; text-align: center;
+}
+.histogram-bar .bar-label { font-size: 0.7rem; }
+.bar .bar-label { font-size: 0.8rem; font-weight: 500; }
+.histogram-bar .bar-value, .bar .bar-value {
+ position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+ font-weight: 600; color: var(--text); background: var(--card-bg-glass); /* Fondo de cristal */
+ padding: 2px 6px; border-radius: 4px; opacity: 0; transition: opacity 0.2s ease;
+}
+.histogram-bar .bar-value { font-size: 0.8rem; }
+.bar .bar-value { font-size: 0.85rem; }
+.histogram-bar:hover .bar-value, .bar:hover .bar-value { opacity: 1; }
+
+.pie-chart-container { display: flex; align-items: center; justify-content: center; gap: 30px; padding-top: 20px; }
+.pie-chart {
+ width: 200px; height: 200px; border-radius: 50%; position: relative;
+ /* Gráfico de pastel ajustado a nuestra paleta */
+ background-image: conic-gradient(var(--accent1) 0% 40%, var(--accent2) 40% 65%, var(--accent3) 65% 85%, #6a8299 85% 100%);
+ border: 3px solid var(--border-color); box-shadow: 0 5px 15px var(--shadow-color);
+}
+.pie-legend { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.legend-item { display: flex; align-items: center; font-size: 0.95rem; color: var(--text); }
+.legend-color { width: 18px; height: 18px; border-radius: 4px; margin-right: 10px; }
+
+.comparison-table { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 0.95rem; }
+.comparison-table th, .comparison-table td { border: 1px solid var(--border-color); padding: 12px 15px; text-align: left; }
+.comparison-table th { 
+ background-color: rgba(var(--accent-rgb), 0.1); /* Fondo azul */
+ color: var(--accent1); /* Azul */
+}
+.comparison-table td { color: var(--text); }
+.comparison-table .check::before { content: '✔'; color: #2ecc71; margin-right: 8px;}
+.comparison-table .cross::before { content: '✖'; color: #e74c3c; margin-right: 8px;}
+
+.distribution-types { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 25px 0; }
+.distribution-card { background-color: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; }
+.distribution-card h4 { color: var(--accent2); margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+.distribution-card ul { padding-left: 20px; color: var(--text); }
+
+.normal-curve-container {
+ background-color: rgba(0,0,0,0.15); border-radius: 15px; padding: 30px 20px;
+ margin-top: 30px; display: flex; flex-direction: column; align-items: center;
+}
+.bell-curve {
+ width: 100%; max-width: 600px; height: 250px; position: relative;
+ display: flex; align-items: flex-end; justify-content: center;
+}
+.curve-shape {
+ width: 100%; height: 100%;
+ background: radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb), 0.25) 0%, transparent 70%); /* Resplandor azul */
+ position: absolute; bottom: 0;
+}
+.curve-shape::before {
+ content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 180px;
+ border: 3px solid var(--accent1); /* Borde azul */
+ border-color: var(--accent1) transparent transparent transparent;
+ border-radius: 50% / 100% 100% 0 0; transform: scaleX(1.8);
+}
+.sd-line { position: absolute; bottom: 0; width: 2px; background-color: var(--muted); opacity: 0.6; }
+.sd-line.mean { background-color: var(--accent2); opacity: 1; height: 100%; } /* Media dorada */
+.sd-line.one-sd { height: 75%; }
+.sd-line.two-sd { height: 40%; }
+.sd-line.three-sd { height: 15%; }
+.sd-label {
+ position: absolute; bottom: -25px; color: var(--muted);
+ font-family: 'Fira Code', monospace; font-size: 0.9rem; transform: translateX(-50%);
+}
+.sd-label.mean-label { color: var(--accent2); font-weight: bold; } /* Dorado */
+.area-segment {
+ position: absolute; bottom: 40%; font-size: 1.1rem; font-weight: bold;
+ color: var(--text); text-shadow: 0 2px 5px var(--shadow-color); pointer-events: none;
+}
+.area-segment.p68 { left: 50%; transform: translateX(-50%); }
+.area-segment.p95 { left: 50%; transform: translateX(-50%); bottom: 20%; font-size: 1rem; }
+.area-segment.p997 { left: 50%; transform: translateX(-50%); bottom: 5%; font-size: 0.9rem; }
+.formula { 
+ background-color: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; 
+ text-align: center; overflow-x: auto; margin: 15px 0;
+ color: var(--text); /* Asegura color de texto */
+}
+
+.workflow-step { 
+ border-left: 3px solid var(--accent2); /* Dorado */
+ padding-left: 20px; margin: 30px 0; 
+}
+.binning-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+.binning-example { border: 1px solid var(--border-color); border-radius: 10px; padding: 15px; background: rgba(0,0,0,0.1); }
+.binning-example h4 { text-align: center; margin-top: 0; margin-bottom: 15px; color: var(--text); font-size: 1rem; }
+.binning-example .status-good { color: #2ecc71; }
+.binning-example .status-bad { color: #e74c3c; }
+.mini-histo { height: 120px; display: flex; align-items: flex-end; gap: 2px; border-left: 1px solid var(--muted); border-bottom: 1px solid var(--muted); padding: 2px; }
+.mini-bar { flex: 1; background-color: var(--accent1); } /* Azul */
+.data-flow-container { background-color: rgba(0,0,0,0.15); border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; margin-top: 30px; }
+.data-flow-step { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px dashed var(--border-color); }
+.data-flow-step:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.data-flow-step h4 { display: flex; align-items: center; color: var(--accent2); font-size: 1.2rem; } /* Dorado */
+.step-number {
+ display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+ border-radius: 50%; 
+ background-color: var(--accent2); /* Dorado */
+ color: var(--bg-base); /* Color de fondo oscuro */
+ font-weight: bold; margin-right: 15px;
+}
+.mini-table { width: 100%; max-width: 500px; border-collapse: collapse; margin-top: 15px; }
+.mini-table th, .mini-table td { border: 1px solid var(--border-color); padding: 8px; text-align: center; font-size: 0.9rem; }
+.mini-table th { background-color: rgba(0,0,0,0.2); color: var(--muted); }
+.mini-table td { color: var(--text); } /* Asegura color de texto */
+.mini-table tr.filtered-out { opacity: 0.3; text-decoration: line-through; transition: opacity 0.5s ease; }
+.highlight { background-color: rgba(var(--accent-2-rgb), 0.2); font-weight: bold; } /* Resaltado dorado */
+
+@media (max-width: 1200px) { .visual-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1024px) {
+ .page-layout { grid-template-columns: 1fr; }
+ .sidebar { position: static; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+}
+@media (max-width: 768px) { .sheet { padding: 25px; } .title { font-size: 2.5rem; } }
+
+/* ------------------------------
+   ADAPTACIONES MÓVILES (PEGAR AL FINAL)
+   ------------------------------ */
+
+/* Mejor interacción táctil para botones */
+button, .btn, .quiz-option {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.06);
+}
+
+/* Scroll horizontal suave para controles compactos */
+.controls { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Ajustes generales para pantallas pequeñas */
+@media (max-width: 600px) {
+  /* Body: menos padding para que no exista mucho espacio perdido en pantallas pequeñas */
+  body {
+    padding: 90px 12px 28px 12px;
+  }
+
+  /* Nav: barra más compacta y con espacio lateral coherente */
+  nav.topbar { height: 64px; padding: 6px 8px; }
+  nav.topbar .bar {
+    height: 52px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+  }
+
+  /* Logo y marca: texto secundario oculto para ahorrar espacio */
+  .brand .logo { width: 40px; height: 40px; flex: 0 0 40px; }
+  .brand h4{ font-size: 0.98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand p{ display: none; } /* ocultamos subtítulo en móvil para ganar espacio */
+
+  /* Controles: más compactos y más fáciles de tocar */
+  .controls { gap: 8px; }
+  .btn { padding: 10px 10px; font-size: 0.95rem; border-radius: 10px; }
+
+  /* Hoja principal (sheet): menos padding, radio más pequeño */
+  .sheet { padding: 20px; border-radius: 18px; margin: 36px 0; }
+
+  /* Título y subtítulo */
+  .title { font-size: 2.2rem; line-height: 1.05; }
+  .subtitle { font-size: 1rem; max-width: 100%; padding: 0 6px; }
+
+  /* Layout: columna única, gaps más pequeños */
+  .page-layout { grid-template-columns: 1fr; gap: 18px; }
+
+  /* Sidebar: pasar a top (ya cambia en 1024 pero reforzamos comportamiento) */
+  .sidebar { position: static; top: auto; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); }
+
+  /* Visuals: un columna y tamaños compactos */
+  .visual-grid { grid-template-columns: 1fr; gap: 18px; }
+  .distribution-types { grid-template-columns: 1fr; gap: 14px; }
+
+  /* Gráficas: alto reducido para caber */
+  .histogram-container, .bar-chart-container { height: 260px; padding: 16px; }
+  .pie-chart { width: 150px; height: 150px; }
+
+  /* Mini histo y otros widgets: ajustes para móviles */
+  .mini-histo { height: 90px; }
+  .mini-table { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Tablas: tamaño de fuente un poco menor para no romper diseño */
+  table.frequency-table, .comparison-table { font-size: 0.88rem; }
+
+  /* Quiz: opciones con mejor tamaño táctil */
+  .quiz-option { padding: 14px; font-size: 1rem; border-radius: 12px; }
+
+  /* Botón de reinicio: más grande para tocar */
+  #quiz-reset-btn { padding: 12px 20px; font-size: 1rem; }
+
+  /* Fórmulas y bloques con overflow horizontal manejable */
+  .formula { padding: 12px; font-size: 0.95rem; }
+
+  /* Aseguramos que el nav no tape contenido en iOS con safe-area-inset */
+  nav.topbar { padding-top: calc(env(safe-area-inset-top, 0) + 6px); }
+}
+
+/* Ajustes extra para pantallas muy pequeñas (<= 400px) */
+@media (max-width: 400px) {
+  .sheet { padding: 16px; border-radius: 14px; }
+  .title { font-size: 1.8rem; }
+  .brand .logo { width: 36px; height: 36px; flex: 0 0 36px; }
+  .controls { gap: 6px; }
+  .btn { padding: 10px 8px; font-size: 0.92rem; }
+  .histogram-container, .bar-chart-container { height: 220px; }
+  .pie-chart { width: 130px; height: 130px; }
+  .visual-grid { gap: 14px; }
+}
+
+.btn:focus, .quiz-option:focus { outline: 3px solid rgba(var(--accent-rgb),0.18); outline-offset: 2px; }
+
+/* ---------- FIX: MOBILE MENU - asegurar que NO se muestre en desktop ---------- */
+
+/* valor por defecto: oculto (siempre) */
+.mobile-menu {
+  display: none !important; /* oculto por defecto en todas las pantallas */
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px) scaleY(0.98);
+}
+
+/* botón hamburger por defecto oculto (lo mostraremos en media queries) */
+.hamburger {
+  display: none;
+}
+
+/* Links principales (desktop) */
+.main-links {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* estilos de link */
+.main-links .nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: all .18s ease;
+  border: 1px solid transparent;
+}
+.main-links .nav-link:hover, .main-links .nav-link:focus {
+  color: var(--text);
+  background: var(--card-bg-solid);
+  border-color: var(--card-border);
+  transform: translateY(-2px);
+}
+
+/* ---------- Reglas para pantalla móvil (<= 1024px) ---------- */
+@media (max-width: 1024px) {
+
+  /* esconder los links principales, mostrar hamburger */
+  .main-links { display: none; }
+  .hamburger {
+    display: inline-flex;
+    background: transparent;
+    border: 1px solid var(--card-border);
+    padding: 8px 10px;
+    border-radius: 10px;
+  }
+
+  /* panel del menú móvil: solo se muestra cuando .open está presente */
+  .mobile-menu {
+    position: fixed;
+    top: calc(72px + 8px); /* ajusta si cambias la altura del nav */
+    left: 12px;
+    right: 12px;
+    background: var(--card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 10px;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    box-shadow: 0 10px 30px rgba(2,8,20,0.45);
+    z-index: 1400;
+    transform-origin: top center;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+
+    /* estado oculto (inicio) */
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.98);
+    transition: transform 220ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease, visibility 0s linear 220ms;
+  }
+
+  /* cuando tenga .open se muestra (display:block + transición) */
+  .mobile-menu.open {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    transition: transform 220ms cubic-bezier(.2,.9,.3,1), opacity 180ms ease;
+  }
+
+  .mobile-nav-list { list-style:none; margin:0; padding: 6px; display:flex; flex-direction:column; gap:8px; }
+  .mobile-nav-list a {
+    display:block; padding: 12px 14px; text-decoration:none; color:var(--text); border-radius:10px;
+    font-weight:600;
+    min-height:44px; display:inline-flex; align-items:center;
+  }
+  .mobile-nav-list a:hover, .mobile-nav-list a:focus {
+    background: var(--card-bg-solid);
+    color: var(--accent1);
+    outline: none;
+  }
+
+  /* cuando el menú está abierto, evitamos scroll en body (JS añade la clase) */
+  body.menu-open { overflow: hidden; touch-action: none; }
+}
+
+/* ---------- Garantía extra: en pantallas grandes reforzamos ocultamiento del mobile-menu ---------- */
+@media (min-width: 1025px) {
+  .mobile-menu { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+  .hamburger { display: none !important; }
+  .main-links { display: flex !important; }
+}
+
+</style>
+
+<script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script"></script>
+
+</head>
+<body>
+<nav class="topbar" role="navigation" aria-label="Main navigation">
+  <div class="bar">
+    <div class="brand" aria-hidden="false">
+      <div class="logo">PyE</div>
+      <div class="brand-text">
+        <h4>Probabilidad y Estadística</h4>
+        <p>Elavoracion de Proyecto Final</p>
+      </div>
+    </div>
+
+    <!-- ENLACES PRINCIPALES: siempre visibles en desktop; en móvil se quedan dentro del menú -->
+    <div class="main-links">
+      <a class="nav-link" href="index.html">Estadísticas</a>
+      <a class="nav-link" href="MetodoCientifico.html">Método Científico</a>
+      <a class="nav-link" href="#">Explicación</a>
+    </div>
+
+    <!-- BOTÓN HAMBURGER para móvil -->
+    <button class="btn hamburger" id="hamburger" aria-controls="mobile-menu" aria-expanded="false" aria-label="Abrir menú">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- MENÚ MÓVIL (solo con los mismos 3 enlaces) -->
+  <div id="mobile-menu" class="mobile-menu" role="menu" aria-hidden="true">
+    <ul class="mobile-nav-list">
+      <li><a href="index.html" role="menuitem">Estadísticas</a></li>
+      <li><a href="MetodoCientifico.html" role="menuitem">Método Científico</a></li>
+      <li><a href="#" role="menuitem">Explicación</a></li>
+    </ul>
+  </div>
+</nav>
+
+
+  <div class="container">
+    <div class="sheet">
+        <header class="header">
+            <h1 class="title">Fundamentos de Estadística</h1>
+            <p class="subtitle">Explora los conceptos clave que impulsan el análisis de datos, desde las medidas descriptivas hasta la visualización y las distribuciones de probabilidad.</p>
+        </header>
+        
+        <div class="page-layout">
+            <aside class="sidebar">
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li><a href="#descriptiva">1. Estadística Descriptiva</a></li>
+                        <li><a href="#frecuencias">2. Tablas de Frecuencia</a></li>
+                        <li><a href="#visualizacion">3. Visualización de Datos</a></li>
+                        <li><a href="#distribuciones">4. Distribuciones</a></li>
+                        <li><a href="#manejo">5. Manejo de Datos</a></li>
+                        <li><a href="#quiz">6. Quiz Interactivo</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+            <section id="descriptiva" class="content-section">
+    <h2>1. Estadística Descriptiva: El Arte de Resumir Datos</h2>
+    <p>La Estadística Descriptiva es el pilar fundamental sobre el cual se construye cualquier análisis de datos. Su propósito no es hacer predicciones ni inferir conclusiones sobre un grupo más grande, sino <strong>organizar, resumir y presentar de manera clara y concisa las características esenciales de un conjunto de datos observado</strong>. Es el proceso de transformar datos crudos en información comprensible y significativa.</p>
+    <p>Antes de calcular cualquier medida, es crucial entender la naturaleza de nuestros datos.</p>
+    
+    <h3>Tipos de Variables: La Materia Prima</h3>
+    <p>Las estadísticas que podemos calcular dependen del tipo de variable que estemos analizando.</p>
+    <ul>
+        <li><strong>Variables Cualitativas (Categóricas):</strong> Describen una cualidad o característica. No se miden numéricamente.
+            <ul>
+                <li><strong>Nominales:</strong> Categorías sin un orden inherente. Ej: País de origen ('México', 'España'), Género ('Masculino', 'Femenino'), Color ('Rojo', 'Azul').</li>
+                <li><strong>Ordinales:</strong> Categorías con un orden o jerarquía clara, pero la distancia entre ellas no es uniforme. Ej: Nivel de satisfacción ('Malo', 'Regular', 'Bueno'), Clase social ('Baja', 'Media', 'Alta').</li>
+            </ul>
+        </li>
+        <li><strong>Variables Cuantitativas (Numéricas):</strong> Se expresan mediante números y permiten operaciones aritméticas.
+            <ul>
+                <li><strong>Discretas:</strong> Toman valores enteros y finitos, resultado de un conteo. Ej: Número de hijos, Cantidad de coches vendidos, Páginas de un libro.</li>
+                <li><strong>Continuas:</strong> Pueden tomar cualquier valor dentro de un rango determinado, resultado de una medición. Ej: Altura (1.75m), Temperatura (23.5°C), Salario ($15,450.75).</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>Medidas de Tendencia Central: Buscando el Corazón de los Datos</h3>
+    <p>Estos valores intentan encontrar el "centro" o el punto más representativo del conjunto de datos.</p>
+    <ul>
+        <li>
+            <strong>Media Aritmética ($\bar{x}$ para muestra, $\mu$ para población):</strong> El promedio clásico. Es la suma de todos los valores dividida por el número total de datos.
+            $$ \bar{x} = \frac{\sum_{i=1}^{n} x_i}{n} $$
+            Es la medida más utilizada, pero su gran debilidad es su <strong>sensibilidad a valores atípicos (outliers)</strong>, que pueden distorsionar drásticamente el resultado.
+        </li>
+        <li>
+            <strong>Mediana ($Me$):</strong> El valor que ocupa la posición central una vez que todos los datos han sido ordenados. Divide el conjunto de datos en dos mitades exactas (50% por debajo, 50% por encima). Es una medida <strong>robusta</strong>, lo que significa que no se ve afectada por outliers.
+        </li>
+        <li>
+            <strong>Moda ($Mo$):</strong> El valor que aparece con la mayor frecuencia. Es la única medida de tendencia central aplicable a variables cualitativas nominales. Un conjunto puede ser:
+            <ul>
+                <li><strong>Unimodal:</strong> Una sola moda.</li>
+                <li><strong>Bimodal/Multimodal:</strong> Dos o más modas.</li>
+                <li><strong>Amodal:</strong> Ningún valor se repite más que otros.</li>
+            </ul>
+        </li>
+        <li><strong>Media Recortada (Trimmed Mean):</strong> Una solución intermedia entre la media y la mediana. Se calcula eliminando un pequeño porcentaje de los valores más altos y más bajos antes de calcular la media, haciéndola menos sensible a outliers.</li>
+    </ul>
+
+    <h3>Medidas de Posición y Cuantiles: Mapeando la Distribución</h3>
+    <p>Los cuantiles son puntos tomados a intervalos regulares de la función de distribución de una variable. Permiten dividir los datos ordenados en partes iguales.</p>
+    <ul>
+        <li><strong>Cuartiles (Q1, Q2, Q3):</strong> Dividen los datos en cuatro partes iguales.
+            <ul>
+                <li><strong>Q1 (Primer Cuartil):</strong> El percentil 25. El 25% de los datos es menor o igual a este valor.</li>
+                <li><strong>Q2 (Segundo Cuartil):</strong> El percentil 50. Es, por definición, la <strong>Mediana</strong>.</li>
+                <li><strong>Q3 (Tercer Cuartil):</strong> El percentil 75. El 75% de los datos es menor o igual a este valor.</li>
+            </ul>
+        </li>
+        <li><strong>Deciles (D1...D9) y Percentiles (P1...P99):</strong> Generalizaciones de los cuartiles que dividen los datos en 10 y 100 partes iguales, respectivamente. Son extremadamente útiles para clasificar y comparar individuos dentro de una población (ej. "estar en el percentil 95 de ingresos").</li>
+    </ul>
+
+    <h3>Medidas de Dispersión: Cuantificando la Variabilidad</h3>
+    <p>Estas medidas nos dicen qué tan "esparcidos" o "concentrados" están los datos. Dos conjuntos pueden tener la misma media pero una dispersión completamente diferente.</p>
+    <ul>
+        <li><strong>Rango:</strong> La diferencia entre el valor máximo y el mínimo. Es fácil de calcular pero muy sensible a outliers.</li>
+        <li><strong>Rango Intercuartílico (IQR):</strong> La distancia entre el tercer y el primer cuartil ($IQR = Q3 - Q1$). Representa el rango en el que se encuentra el 50% central de los datos. Es una medida de dispersión <strong>robusta</strong>.</li>
+        <li>
+            <strong>Varianza ($s^2$ para muestra, $\sigma^2$ para población):</strong> Es el promedio de las desviaciones al cuadrado de cada dato con respecto a la media. Mide la variabilidad total.
+            $$ s^2 = \frac{\sum_{i=1}^{n} (x_i - \bar{x})^2}{n-1} $$
+            Sus unidades están al cuadrado (ej. metros cuadrados), lo que dificulta su interpretación directa.
+        </li>
+        <li>
+            <strong>Desviación Estándar ($s$ para muestra, $\sigma$ para población):</strong> Es la raíz cuadrada de la varianza. Es la medida de dispersión más importante porque está en las <strong>mismas unidades que los datos originales</strong>, facilitando su interpretación. Una desviación estándar de $5 kg significa que, en promedio, los datos se alejan 5 kg de la media.
+        </li>
+    </ul>
+
+    <div class="info-box">
+        <h3>¿Por qué $n-1$? La Corrección de Bessel</h3>
+        <p>Al calcular la varianza de una <strong>muestra</strong>, dividimos por $n-1$ en lugar de $n$. ¿Por qué? Porque la media de la muestra ($\bar{x}$) es solo una estimación de la media real de la población ($\mu$). Se puede demostrar matemáticamente que usar $\bar{x}$ en la fórmula subestima sistemáticamente la verdadera varianza. Dividir por $n-1$ (los "grados de libertad") corrige esta subestimación, dándonos una estimación más precisa de la varianza poblacional.</p>
+    </div>
+
+    <h3>Medidas de Forma: Analizando la Silueta de los Datos</h3>
+    <p>Describen la forma de la distribución de los datos, a menudo en comparación con la distribución normal (la "campana de Gauss").</p>
+    <ul>
+        <li><strong>Coeficiente de Asimetría (Skewness):</strong> Mide el grado de simetría de la distribución.
+            <ul>
+                <li><strong>Asimetría = 0:</strong> Distribución perfectamente simétrica (ej. Normal). Media = Mediana = Moda.</li>
+                <li><strong>Asimetría > 0 (Positiva):</strong> La "cola" de la distribución se alarga hacia la derecha. Hay outliers positivos. Media > Mediana > Moda.</li>
+                <li><strong>Asimetría < 0 (Negativa):</strong> La "cola" se alarga hacia la izquierda. Hay outliers negativos. Media < Mediana < Moda.</li>
+            </ul>
+        </li>
+        <li><strong>Curtosis (Kurtosis):</strong> Mide la concentración de datos alrededor de la media y la "pesadez" de las colas, en comparación con una distribución normal.
+            <ul>
+                <li><strong>Leptocúrtica (Curtosis > 0):</strong> Más puntiaguda que la normal. Mayor concentración de datos cerca de la media y colas más "pesadas" (más probabilidad de outliers).</li>
+                <li><strong>Mesocúrtica (Curtosis = 0):</strong> Curtosis igual a la de una distribución normal.</li>
+                <li><strong>Platicúrtica (Curtosis < 0):</strong> Más achatada que la normal. Menos concentración de datos cerca de la media y colas más "ligeras".</li>
+            </ul>
+        </li>
+    </ul>
+</section>
+
+<section id="distribuciones" class="content-section">
+    <h2>4. Distribuciones de Probabilidad: Modelando la Incertidumbre</h2>
+    <p>Una distribución de probabilidad es un <strong>modelo matemático que describe la probabilidad de ocurrencia de los diferentes resultados posibles en un experimento</strong>. En lugar de mirar los datos que tenemos (el pasado), nos permite modelar los datos que *podríamos* obtener (el futuro). Son la base de la estadística inferencial, el machine learning y la toma de decisiones bajo incertidumbre.</p>
+
+    <div class="distribution-types">
+        <div class="distribution-card">
+            <h4>Distribuciones Discretas</h4>
+            <p>Se aplican a variables que toman un número contable de valores (ej. el resultado de lanzar un dado, el número de clientes que llegan en una hora).</p>
+            <ul>
+                <li><strong>Binomial:</strong> Modela el número de "éxitos" en una serie de $n$ ensayos independientes, cada uno con una probabilidad de éxito $p$. Ej: La probabilidad de obtener 7 caras en 10 lanzamientos de una moneda.</li>
+                <li><strong>Poisson:</strong> Modela el número de eventos que ocurren en un intervalo fijo de tiempo o espacio, dada una tasa promedio de ocurrencia ($\lambda$). Ej: El número de correos electrónicos que recibes por hora.</li>
+            </ul>
+        </div>
+        <div class="distribution-card">
+            <h4>Distribuciones Continuas</h4>
+            <p>Se aplican a variables que pueden tomar cualquier valor dentro de un rango (ej. altura, temperatura, tiempo). La probabilidad no se asigna a un punto, sino a un <strong>intervalo</strong>.</p>
+            <ul>
+                <li><strong>Uniforme:</strong> Todos los resultados en un rango [a, b] son igualmente probables. La gráfica de su función de densidad es un rectángulo.</li>
+                <li><strong>Exponencial:</strong> Modela el tiempo hasta que ocurre un evento en un proceso de Poisson. Ej: El tiempo hasta la próxima llamada en un call center.</li>
+                <li><strong>Normal:</strong> La más importante y ubicua de todas las distribuciones.</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>La Distribución Normal: La Reina de la Estadística</h3>
+    <p>También conocida como <strong>Campana de Gauss</strong>, es una distribución continua simétrica definida por dos parámetros: la <strong>media ($\mu$)</strong>, que determina su centro, y la <strong>desviación estándar ($\sigma$)</strong>, que determina su anchura o dispersión.</p>
+    <div class="formula">
+        $$ f(x | \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}} $$
+    </div>
+    <p>Su importancia radica en el <strong>Teorema del Límite Central</strong>, que postula que la suma (o el promedio) de un gran número de variables aleatorias independientes tenderá a distribuirse normalmente, sin importar la distribución original de dichas variables. Esto hace que la distribución normal aparezca en innumerables fenómenos naturales y procesos industriales.</p>
+
+    <div class="normal-curve-container">
+        <h4>La Regla Empírica (68-95-99.7)</h4>
+        <p>Esta regla es una de las propiedades más útiles de la distribución normal y proporciona una forma rápida de entender la dispersión de los datos:</p>
+        <div class="bell-curve">
+            <div class="curve-shape"></div>
+            <div class="sd-line mean" style="left: 50%;"></div>
+            <div class="sd-line one-sd" style="left: calc(50% - 1*16.66%);"></div>
+            <div class="sd-line one-sd" style="left: calc(50% + 1*16.66%);"></div>
+            <div class="sd-line two-sd" style="left: calc(50% - 2*16.66%);"></div>
+            <div class="sd-line two-sd" style="left: calc(50% + 2*16.66%);"></div>
+            <div class="sd-line three-sd" style="left: calc(50% - 3*16.66%);"></div>
+            <div class="sd-line three-sd" style="left: calc(50% + 3*16.66%);"></div>
+
+            <span class="sd-label mean-label" style="left: 50%;">μ</span>
+            <span class="sd-label" style="left: calc(50% - 1*16.66%);">μ-σ</span>
+            <span class="sd-label" style="left: calc(50% + 1*16.66%);">μ+σ</span>
+            <span class="sd-label" style="left: calc(50% - 2*16.66%);">μ-2σ</span>
+            <span class="sd-label" style="left: calc(50% + 2*16.66%);">μ+2σ</span>
+            <span class="sd-label" style="left: calc(50% - 3*16.66%);">μ-3σ</span>
+            <span class="sd-label" style="left: calc(50% + 3*16.66%);">μ+3σ</span>
+            
+            <div class="area-segment p68" style="width: 33.33%;"><strong>68%</strong></div>
+            <div class="area-segment p95" style="width: 66.66%;"><strong>95%</strong></div>
+            <div class="area-segment p997" style="width: 100%;"><strong>99.7%</strong></div>
+        </div>
+    </div>
+    
+    <div class="info-box">
+        <h3>Aplicación Práctica: ¿Por Qué Nos Importa?</h3>
+        <p>En tu suite de análisis, al superponer la curva normal teórica sobre el histograma, estás realizando una <strong>evaluación visual de normalidad</strong>.</p>
+        <ul>
+            <li><strong>Si tus datos se ajustan a la curva</strong>, significa que puedes aplicar con confianza una vasta gama de técnicas estadísticas paramétricas (como las pruebas t, ANOVA, etc.) que asumen que los datos son normales.</li>
+            <li><strong>Si tus datos no se ajustan</strong>, te alerta de que podrías necesitar transformar los datos o utilizar métodos no paramétricos, que no dependen de la forma de la distribución.</li>
+            <li>La <strong>puntuación Z (Z-score)</strong>, $Z = (x - \mu) / \sigma$, nos dice cuántas desviaciones estándar un punto de dato está de la media. Es una forma estandarizada de medir la posición relativa de un valor y detectar outliers.</li>
+        </ul>
+        <p>En resumen, entender las distribuciones no solo describe los datos, sino que desbloquea la capacidad de hacer <strong>inferencias estadísticas válidas</strong> sobre ellos.</p>
+    </div>
+</section>
+
+           
+<section id="frecuencias" class="content-section">
+    <h2>2. Tablas de Frecuencia: Estructurando la Distribución</h2>
+    <p>Si la estadística descriptiva es el resumen, la tabla de frecuencias es el esqueleto que le da forma. Es una herramienta que transforma un mar de datos desorganizados en una estructura clara que revela la distribución subyacente, facilitando el análisis y la visualización.</p>
+
+    <h3>Datos No Agrupados vs. Datos Agrupados</h3>
+    <p>El enfoque para construir la tabla depende de la variable:</p>
+    <ul>
+        <li><strong>Datos No Agrupados:</strong> Ideal para variables <strong>cualitativas</strong> (ej. 'Rojo', 'Verde') o <strong>cuantitativas discretas</strong> con pocos valores únicos (ej. número de hijos). Se cuenta la frecuencia de cada categoría directamente.</li>
+        <li><strong>Datos Agrupados:</strong> Esencial para variables <strong>cuantitativas continuas</strong> (ej. altura, peso) o discretas con muchos valores. Los datos se agrupan en <strong>intervalos de clase</strong> (bins) para hacerlos manejables.</li>
+    </ul>
+
+    <div class="example-container">
+        <h4>Ejemplo Visual: De Datos Crudos a Histograma</h4>
+        <p>Imaginemos que tenemos las calificaciones de 25 estudiantes en un examen. Los datos crudos se ven así:</p>
+        <div class="raw-data-pills">
+            <span class="data-pill">85</span><span class="data-pill">92</span><span class="data-pill">78</span><span class="data-pill">64</span><span class="data-pill">75</span><span class="data-pill">88</span><span class="data-pill">95</span><span class="data-pill">71</span><span class="data-pill">68</span><span class="data-pill">82</span><span class="data-pill">90</span><span class="data-pill">76</span><span class="data-pill">83</span><span class="data-pill">79</span><span class="data-pill">98</span><span class="data-pill">65</span><span class="data-pill">73</span><span class="data-pill">89</span><span class="data-pill">91</span><span class="data-pill">77</span><span class="data-pill">84</span><span class="data-pill">69</span><span class="data-pill">80</span><span class="data-pill">94</span><span class="data-pill">74</span>
+        </div>
+
+        <h4>Paso 1: Calcular los Parámetros del Intervalo</h4>
+        <p>Para agrupar estos datos, necesitamos definir los intervalos.</p>
+        <div class="calculation-step"><strong>1. Rango (R):</strong> $R = \text{Dato Máximo} - \text{Dato Mínimo} = 98 - 64 = 34$.</div>
+        <div class="calculation-step"><strong>2. Número de Intervalos (k):</strong> Usamos la Regla de Sturges: $k \approx 1 + 3.322 \log_{10}(25) \approx 1 + 3.322(1.398) \approx 5.64$. Redondeamos a <strong>k=6 intervalos</strong>.</div>
+        <div class="calculation-step"><strong>3. Amplitud del Intervalo (w):</strong> $w \approx R/k = 34/6 \approx 5.67$. Redondeamos al entero superior más conveniente: <strong>w=6</strong>.</div>
+
+        <h4>Paso 2: Construir la Tabla de Frecuencias</h4>
+        <p>Con estos parámetros, contamos cuántos estudiantes caen en cada intervalo de 6 puntos.</p>
+        <table class="frequency-table">
+            <thead>
+                <tr>
+                    <th>Intervalo</th>
+                    <th>Marca (xᵢ)</th>
+                    <th>Frec. Abs. (fᵢ)</th>
+                    <th>Frec. Rel. (hᵢ)</th>
+                    <th>F. Abs. Acum. (Fᵢ)</th>
+                    <th>F. Rel. Acum. (Hᵢ)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>[64 - 70)</td>
+                    <td>67</td>
+                    <td>4</td>
+                    <td>0.16 (16%)</td>
+                    <td>4</td>
+                    <td>0.16 (16%)</td>
+                </tr>
+                <tr>
+                    <td>[70 - 76)</td>
+                    <td>73</td>
+                    <td>5</td>
+                    <td>0.20 (20%)</td>
+                    <td>9</td>
+                    <td>0.36 (36%)</td>
+                </tr>
+                <tr>
+                    <td>[76 - 82)</td>
+                    <td>79</td>
+                    <td>5</td>
+                    <td>0.20 (20%)</td>
+                    <td>14</td>
+                    <td>0.56 (56%)</td>
+                </tr>
+                <tr>
+                    <td>[82 - 88)</td>
+                    <td>85</td>
+                    <td>4</td>
+                    <td>0.16 (16%)</td>
+                    <td>18</td>
+                    <td>0.72 (72%)</td>
+                </tr>
+                <tr>
+                    <td>[88 - 94)</td>
+                    <td>91</td>
+                    <td>5</td>
+                    <td>0.20 (20%)</td>
+                    <td>23</td>
+                    <td>0.92 (92%)</td>
+                </tr>
+                <tr>
+                    <td>[94 - 100)</td>
+                    <td>97</td>
+                    <td>2</td>
+                    <td>0.08 (8%)</td>
+                    <td>25</td>
+                    <td>1.00 (100%)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Paso 3: Visualizar la Distribución</h4>
+        <p>La tabla es la fuente directa para crear gráficos. La <strong>Frecuencia Absoluta (fᵢ)</strong> se convierte en la altura de las barras del <strong>Histograma</strong>, que nos muestra la forma de la distribución de las calificaciones.</p>
+        
+        <div class="visual-grid">
+            <div class="histogram-container">
+                <div class="histogram-title">Histograma de Frecuencias</div>
+                <div class="histogram-chart">
+                    <div class="histogram-bar" style="height: 26.6%;">
+                        <span class="bar-value">4</span><span class="bar-label">[64-70)</span>
+                    </div>
+                    <div class="histogram-bar" style="height: 33.3%;">
+                        <span class="bar-value">5</span><span class="bar-label">[70-76)</span>
+                    </div>
+                    <div class="histogram-bar" style="height: 33.3%;">
+                        <span class="bar-value">5</span><span class="bar-label">[76-82)</span>
+                    </div>
+                    <div class="histogram-bar" style="height: 26.6%;">
+                        <span class="bar-value">4</span><span class="bar-label">[82-88)</span>
+                    </div>
+                    <div class="histogram-bar" style="height: 33.3%;">
+                        <span class="bar-value">5</span><span class="bar-label">[88-94)</span>
+                    </div>
+                    <div class="histogram-bar" style="height: 13.3%;">
+                        <span class="bar-value">2</span><span class="bar-label">[94-100)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-explanation">
+                <h3>Interpretando la Visualización</h3>
+                <p>El histograma nos permite ver de inmediato:</p>
+                <ul>
+                    <li><strong>Concentración:</strong> La mayoría de los estudiantes (10 de 25) obtuvieron calificaciones entre 70 y 82.</li>
+                    <li><strong>Forma:</strong> La distribución es relativamente simétrica, con un ligero agrupamiento en el centro. No parece haber un sesgo pronunciado.</li>
+                    <li><strong>Dispersión:</strong> Las calificaciones se extienden desde los 60s bajos hasta casi 100, mostrando una variabilidad considerable.</li>
+                    <li>La <strong>Ojiva</strong> (no mostrada) sería un gráfico de líneas ascendente que usaría la columna de <strong>Frecuencia Acumulada (Fᵢ)</strong> para mostrar cuántos estudiantes obtuvieron una calificación <em>hasta</em> cierto punto.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="visualizacion" class="content-section">
+    <h2>3. Visualización de Datos: Contando Historias con Gráficos</h2>
+    <p>"Una imagen vale más que mil números". La visualización de datos es el puente entre el análisis cuantitativo y la cognición humana. Transforma conjuntos de datos, a menudo complejos y abstractos, en representaciones gráficas intuitivas que permiten a nuestro cerebro identificar patrones, tendencias y anomalías de forma casi instantánea.</p>
+
+    <h3>Histograma: Revelando la Forma de los Datos Numéricos</h3>
+    <p>Es la gráfica por excelencia para visualizar la distribución de <strong>datos numéricos continuos o agrupados</strong>. A diferencia de un gráfico de barras, las barras en un histograma son <strong>contiguas (se tocan)</strong> para representar la naturaleza continua de la variable en el eje X.</p>
+    <div class="visual-grid">
+        <div class="histogram-container">
+            <div class="histogram-title">Distribución de Edades</div>
+            <div class="histogram-chart">
+                <div class="histogram-bar" style="height: 30%;"><span class="bar-value">9</span><span class="bar-label">[20-25)</span></div>
+                <div class="histogram-bar" style="height: 70%;"><span class="bar-value">21</span><span class="bar-label">[25-30)</span></div>
+                <div class="histogram-bar" style="height: 100%;"><span class="bar-value">30</span><span class="bar-label">[30-35)</span></div>
+                <div class="histogram-bar" style="height: 80%;"><span class="bar-value">24</span><span class="bar-label">[35-40)</span></div>
+                <div class="histogram-bar" style="height: 40%;"><span class="bar-value">12</span><span class="bar-label">[40-45)</span></div>
+                <div class="histogram-bar" style="height: 15%;"><span class="bar-value">5</span><span class="bar-label">[45-50)</span></div>
+            </div>
+        </div>
+        <div>
+            <h4>Qué Analizar en un Histograma:</h4>
+            <ul>
+                <li><strong>Centralidad:</strong> ¿Dónde se encuentra el pico o centro de los datos? (Aquí, entre 30-35 años).</li>
+                <li><strong>Dispersión:</strong> ¿Qué tan ancha es la distribución? (Aquí, abarca desde los 20 hasta los 50 años).</li>
+                <li><strong>Forma (Simetría):</strong> ¿Es simétrica o tiene una "cola" más larga hacia un lado? (Este ejemplo es relativamente simétrico, con un ligero sesgo a la derecha).</li>
+                <li><strong>Modalidad:</strong> ¿Cuántos picos tiene? (Este es <strong>unimodal</strong>, un solo pico. Dos picos podrían indicar dos grupos distintos en los datos).</li>
+                <li><strong>Outliers:</strong> ¿Hay barras muy pequeñas y aisladas lejos del grupo principal?</li>
+            </ul>
+        </div>
+    </div>
+    
+    <h3>Gráfico de Barras: Comparando Categorías Discretas</h3>
+    <p>Es la herramienta ideal para comparar valores entre <strong>categorías discretas y separadas</strong>. La clave visual es el <strong>espacio entre las barras</strong>, que enfatiza que cada categoría es independiente. La longitud de cada barra es proporcional a la frecuencia o al valor que representa.</p>
+    <div class="visual-grid">
+         <div>
+            <h4>Usos Comunes:</h4>
+            <ul>
+                <li>Comparar ventas por producto.</li>
+                <li>Mostrar el número de encuestados por país.</li>
+                <li>Visualizar la frecuencia de diferentes géneros de películas.</li>
+                <li><strong>Gráfico horizontal:</strong> Excelente cuando los nombres de las categorías son largos.</li>
+                <li><strong>Gráfico agrupado:</strong> Para comparar sub-categorías dentro de cada grupo principal.</li>
+            </ul>
+        </div>
+        <div class="bar-chart-container">
+            <div class="bar-chart-title">Ventas por Región (Millones USD)</div>
+            <div class="bar-chart">
+                <div class="bar" style="height: 80%;"><span class="bar-value">$12M</span><span class="bar-label">Norte</span></div>
+                <div class="bar" style="height: 50%; background-image: linear-gradient(to top, #FF4500, #FF8C00);"><span class="bar-value">$7.5M</span><span class="bar-label">Sur</span></div>
+                <div class="bar" style="height: 100%;"><span class="bar-value">$15M</span><span class="bar-label">Centro</span></div>
+                <div class="bar" style="height: 65%; background-image: linear-gradient(to top, #FF4500, #FF8C00);"><span class="bar-value">$9.7M</span><span class="bar-label">Oeste</span></div>
+            </div>
+        </div>
+    </div>
+    
+    <h3>Gráfico Circular (Pastel): Mostrando la Composición de un Todo</h3>
+    <p>Este gráfico tiene un único y poderoso propósito: mostrar cómo se divide un total en sus partes constituyentes, es decir, visualizar la <strong>composición porcentual</strong>. Cada "rebanada" representa la frecuencia relativa de una categoría.</p>
+    <div class="visual-grid">
+        <div class="pie-chart-container">
+            <div class="pie-chart"></div>
+            <ul class="pie-legend">
+                <li class="legend-item"><span class="legend-color" style="background-color: var(--accent1);"></span>Marketing (40%)</li>
+                <li class="legend-item"><span class="legend-color" style="background-color: var(--accent2);"></span>I+D (25%)</li>
+                <li class="legend-item"><span class="legend-color" style="background-color: var(--accent3);"></span>Operaciones (20%)</li>
+                <li class="legend-item"><span class="legend-color" style="background-color: #32CD32;"></span>Ventas (15%)</li>
+            </ul>
+        </div>
+        <div class="info-box">
+            <h3>¡Cuidado! El Uso y Abuso del Gráfico de Pastel</h3>
+            <p>Aunque populares, son fáciles de usar incorrectamente. Sigue estas reglas:</p>
+            <ul>
+                <li><strong>Cuándo Usarlo:</strong> Solo cuando tengas <strong>pocas categorías (idealmente 5 o menos)</strong> y el objetivo sea mostrar una simple relación de "parte a todo".</li>
+                <li><strong>Cuándo Evitarlo:</strong>
+                    <ul>
+                        <li>Si necesitas hacer <strong>comparaciones precisas</strong> entre categorías (nuestro cerebro es malo comparando ángulos; un gráfico de barras es mucho mejor).</li>
+                        <li>Si tienes <strong>muchas categorías</strong>, el gráfico se vuelve ilegible.</li>
+                        <li><strong>Nunca uses gráficos de pastel en 3D.</strong> Distorsionan la perspectiva y hacen que las rebanadas más cercanas parezcan más grandes.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <h3>Resumen Comparativo</h3>
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Característica</th>
+                <th>Histograma</th>
+                <th>Gráfico de Barras</th>
+                <th>Gráfico Circular</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Tipo de Datos Primario</strong></td>
+                <td>Cuantitativos (Continuos/Agrupados)</td>
+                <td>Cualitativos (Categóricos)</td>
+                <td>Cualitativos (Categóricos)</td>
+            </tr>
+            <tr>
+                <td><strong>Propósito Principal</strong></td>
+                <td>Mostrar la <strong>distribución</strong> y forma</td>
+                <td><strong>Comparar</strong> valores entre categorías</td>
+                <td>Mostrar la <strong>composición</strong> de un todo</td>
+            </tr>
+            <tr>
+                <td><strong>Barras Juntas</strong></td>
+                <td class="check">Sí, indica continuidad</td>
+                <td class="cross">No, indica categorías discretas</td>
+                <td class="cross">No aplica</td>
+            </tr>
+            <tr>
+                <td><strong>Eje X</strong></td>
+                <td>Escala numérica continua</td>
+                <td>Categorías individuales</td>
+                <td>No tiene eje X</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+                
+
+                <section id="manejo" class="content-section">
+    <h2>5. Manejo de Datos: El Diálogo con la Información</h2>
+    <p>El análisis de datos rara vez es un proceso lineal. Es un diálogo en el que hacemos preguntas a nuestros datos. Las técnicas de manejo de datos son el lenguaje que usamos para formular esas preguntas. Estas no son meras tareas de "limpieza", sino operaciones analíticas fundamentales para segmentar, resumir y descubrir insights profundos.</p>
+    <p>El flujo de trabajo más común y poderoso sigue una secuencia lógica: <strong>Filtrar → Agrupar → Agregar</strong>.</p>
+
+    <div class="workflow-step">
+        <h3>Filtrado: Aislamiento del Foco de Interés</h3>
+        <p>El filtrado es el proceso de <strong>seleccionar un subconjunto de datos (filas) que cumple con uno o más criterios</strong>. Es nuestra herramienta para reducir el ruido y concentrarnos en un segmento específico. Sin filtrado, los promedios y totales pueden enmascarar realidades muy diferentes entre distintos grupos.</p>
+        <p><strong>Preguntas que responde el filtrado:</strong></p>
+        <ul>
+            <li>¿Cómo fueron las ventas <em>solo en la región Norte</em>?</li>
+            <li>¿Cuál es el nivel de satisfacción <em>únicamente de los clientes premium</em>?</li>
+            <li>Analizar el rendimiento <em>solo de los productos lanzados en el último año</em>.</li>
+        </ul>
+    </div>
+
+    <div class="workflow-step">
+        <h3>Agrupación (Grouping & Binning): Creando Categorías Significativas</h3>
+        <p>La agrupación consiste en organizar los datos en grupos o "contenedores" basados en los valores de una o más variables. Hay dos formas principales:</p>
+        <ul>
+            <li><strong>Por Categoría (Grouping):</strong> Agrupar filas que comparten el mismo valor en una columna categórica. Ej: Agrupar todas las ventas por 'Ciudad'.</li>
+            <li><strong>Por Intervalo (Binning):</strong> Convertir una variable numérica continua en una categórica ordinal creando intervalos. Ej: Agrupar 'Edades' en rangos como [18-25], [26-35], etc. Este es el proceso esencial para construir un histograma.</li>
+        </ul>
+        <div class="info-box">
+            <h4>El Dilema del "Binning": El Impacto Visual de los Intervalos</h4>
+            <p>La elección del número de intervalos (bins) en un histograma es crucial. Una mala elección puede ocultar la verdadera forma de la distribución o crear patrones falsos donde no existen.</p>
+        </div>
+        <div class="binning-comparison">
+            <div class="binning-example">
+                <h4>Pocos Bins (k=3) <span class="status-bad">(Oculta detalles)</span></h4>
+                <div class="mini-histo">
+                    <div class="mini-bar" style="height: 60%;"></div>
+                    <div class="mini-bar" style="height: 100%;"></div>
+                    <div class="mini-bar" style="height: 40%;"></div>
+                </div>
+            </div>
+            <div class="binning-example">
+                <h4>Bins Óptimos (k=8) <span class="status-good">(Revela la forma)</span></h4>
+                <div class="mini-histo">
+                    <div class="mini-bar" style="height: 20%;"></div><div class="mini-bar" style="height: 50%;"></div>
+                    <div class="mini-bar" style="height: 90%;"></div><div class="mini-bar" style="height: 100%;"></div>
+                    <div class="mini-bar" style="height: 80%;"></div><div class="mini-bar" style="height: 40%;"></div>
+                    <div class="mini-bar" style="height: 25%;"></div><div class="mini-bar" style="height: 10%;"></div>
+                </div>
+            </div>
+            <div class="binning-example">
+                <h4>Demasiados Bins (k=20) <span class="status-bad">(Crea ruido)</span></h4>
+                <div class="mini-histo">
+                    <div class="mini-bar" style="height: 10%;"></div><div class="mini-bar" style="height: 15%;"></div>
+                    <div class="mini-bar" style="height: 25%;"></div><div class="mini-bar" style="height: 30%;"></div>
+                    <div class="mini-bar" style="height: 50%;"></div><div class="mini-bar" style="height: 40%;"></div>
+                    <div class="mini-bar" style="height: 90%;"></div><div class="mini-bar" style="height: 80%;"></div>
+                    <div class="mini-bar" style="height: 100%;"></div><div class="mini-bar" style="height: 95%;"></div>
+                    <div class="mini-bar" style="height: 70%;"></div><div class="mini-bar" style="height: 80%;"></div>
+                    <div class="mini-bar" style="height: 45%;"></div><div class="mini-bar" style="height: 30%;"></div>
+                    <div class="mini-bar" style="height: 28%;"></div><div class="mini-bar" style="height: 15%;"></div>
+                    <div class="mini-bar" style="height: 5%;"></div> <div class="mini-bar" style="height: 8%;"></div>
+                    <div class="mini-bar" style="height: 12%;"></div><div class="mini-bar" style="height: 5%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="workflow-step">
+        <h3>Agregación: Resumiendo los Grupos</h3>
+        <p>Una vez que los datos están agrupados, el siguiente paso es <strong>aplicar una función de agregación para resumir cada grupo en un solo valor</strong>. Aquí es donde se calculan las estadísticas descriptivas para cada segmento.</p>
+        <p><strong>Funciones de agregación comunes:</strong></p>
+        <ul>
+            <li><strong>SUMA:</strong> Calcular el total de ventas por región.</li>
+            <li><strong>PROMEDIO (MEDIA):</strong> Obtener el precio promedio de producto por categoría.</li>
+            <li><strong>CONTEO (COUNT):</strong> Contar el número de clientes por ciudad.</li>
+            <li><strong>MÁXIMO / MÍNIMO:</strong> Encontrar la calificación más alta y más baja por profesor.</li>
+        </ul>
+    </div>
+    
+    <div class="data-flow-container">
+        <h3>Ejemplo del Flujo Completo: De Datos a Insight</h3>
+        <p>Imaginemos que queremos responder: <strong>"¿Cuál es el total de ventas de los productos de 'Electrónica' en cada región?"</strong></p>
+        
+        <div class="data-flow-step">
+            <h4><span class="step-number">1</span>Filtrar: Seleccionar solo 'Electrónica'</h4>
+            <p>Partimos de nuestra tabla de datos completa y descartamos las filas que no nos interesan.</p>
+            <table class="mini-table">
+                <thead><tr><th>Producto</th><th>Categoría</th><th>Región</th><th>Ventas</th></tr></thead>
+                <tbody>
+                    <tr><td>Laptop</td><td class="highlight">Electrónica</td><td>Norte</td><td>1200</td></tr>
+                    <tr class="filtered-out"><td>Silla</td><td>Hogar</td><td>Norte</td><td>150</td></tr>
+                    <tr><td>Teléfono</td><td class="highlight">Electrónica</td><td>Sur</td><td>800</td></tr>
+                    <tr><td>Tablet</td><td class="highlight">Electrónica</td><td>Norte</td><td>600</td></tr>
+                    <tr class="filtered-out"><td>Mesa</td><td>Hogar</td><td>Sur</td><td>300</td></tr>
+                    <tr><td>Cámara</td><td class="highlight">Electrónica</td><td>Sur</td><td>750</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-flow-step">
+            <h4><span class="step-number">2</span>Agrupar: Organizar por 'Región'</h4>
+            <p>Tomamos los datos filtrados y los organizamos en grupos basados en la columna 'Región'.</p>
+            <table class="mini-table">
+                 <thead><tr><th>Producto</th><th>Categoría</th><th>Región</th><th>Ventas</th></tr></thead>
+                <tbody>
+                    <tr style="background-color: rgba(0, 191, 255, 0.1);"><td>Laptop</td><td>Electrónica</td><td class="highlight">Norte</td><td>1200</td></tr>
+                    <tr style="background-color: rgba(0, 191, 255, 0.1);"><td>Tablet</td><td>Electrónica</td><td class="highlight">Norte</td><td>600</td></tr>
+                    <tr style="background-color: rgba(255, 69, 0, 0.1);"><td>Teléfono</td><td>Electrónica</td><td class="highlight">Sur</td><td>800</td></tr>
+                    <tr style="background-color: rgba(255, 69, 0, 0.1);"><td>Cámara</td><td>Electrónica</td><td class="highlight">Sur</td><td>750</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="data-flow-step">
+            <h4><span class="step-number">3</span>Agregar: Aplicar SUMA a 'Ventas'</h4>
+            <p>Finalmente, aplicamos la función SUM a la columna 'Ventas' para cada grupo, obteniendo el insight final.</p>
+            <table class="mini-table">
+                <thead><tr><th>Región</th><th>Total Ventas (Electrónica)</th></tr></thead>
+                <tbody>
+                    <tr><td class="highlight">Norte</td><td class="highlight">1800</td></tr>
+                    <tr><td class="highlight">Sur</td><td class="highlight">1550</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+                
+                <section id="quiz" class="content-section">
+                    <h2>6. Quiz Interactivo de Estadística</h2>
+                    <p>Pon a prueba tus conocimientos sobre los conceptos que acabas de aprender. ¡Mucha suerte!</p>
+
+                    <div id="quiz-container">
+                        <div class="quiz-card">
+                            <p class="quiz-question">1. ¿Qué medida de tendencia central es más sensible a valores extremadamente altos o bajos (outliers)?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="true">La Media</div>
+                                <div class="quiz-option">La Mediana</div>
+                                <div class="quiz-option">La Moda</div>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-card">
+                            <p class="quiz-question">2. Si quieres visualizar la distribución de las edades (un dato numérico) en una población, ¿qué gráfico sería el más adecuado?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option">Gráfico de Barras</div>
+                                <div class="quiz-option">Gráfico Circular</div>
+                                <div class="quiz-option" data-correct="true">Histograma</div>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+
+                        <div class="quiz-card">
+                            <p class="quiz-question">3. El cuartil 3 (Q3) representa el valor por debajo del cual se encuentra el...</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option">25% de los datos</div>
+                                <div class="quiz-option" data-correct="true">75% de los datos</div>
+                                <div class="quiz-option">50% de los datos</div>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        
+                        <div class="quiz-card">
+                            <p class="quiz-question">4. Una desviación estándar baja significa que los datos tienden a estar...</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="true">Muy agrupados alrededor de la media.</div>
+                                <div class="quiz-option">Muy dispersos y alejados de la media.</div>
+                                <div class="quiz-option">Perfectamente distribuidos en una campana de Gauss.</div>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                        
+                        <div class="quiz-card">
+                            <p class="quiz-question">5. ¿Qué gráfico es mejor para mostrar la composición porcentual de diferentes categorías que suman un 100%?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option">Histograma</div>
+                                <div class="quiz-option" data-correct="true">Gráfico Circular (de Pastel)</div>
+                                <div class="quiz-option">Gráfico de Barras</div>
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    </div>
+                    <div id="quiz-results-container">
+                        <h3 id="quiz-score"></h3>
+                        <button id="quiz-reset-btn">Intentar de Nuevo</button>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+<script>
+(function(){
+  // Esperamos al DOM para ejecutar la mayor parte de la lógica que usa elementos.
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const root = document.documentElement;
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    const saved = localStorage.getItem('theme-mode');
+
+    /* --------- MENU HAMBURGER (solo si existen los elementos) --------- */
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (hamburger && mobileMenu) {
+      const openMenu = () => {
+        mobileMenu.classList.add('open');
+        hamburger.classList.add('open');
+        hamburger.setAttribute('aria-expanded', 'true');
+        mobileMenu.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('menu-open');
+        const first = mobileMenu.querySelector('a, button');
+        if (first) first.focus();
+      };
+
+      const closeMenu = () => {
+        mobileMenu.classList.remove('open');
+        hamburger.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        mobileMenu.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('menu-open');
+        hamburger.focus();
+      };
+
+      hamburger.addEventListener('click', () => {
+        const expanded = hamburger.getAttribute('aria-expanded') === 'true';
+        expanded ? closeMenu() : openMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu();
+      });
+
+      document.addEventListener('click', (e) => {
+        const bar = document.querySelector('.bar');
+        const isInside = mobileMenu.contains(e.target) || hamburger.contains(e.target) || (bar && bar.contains(e.target));
+        if (!isInside && mobileMenu.classList.contains('open')) closeMenu();
+      });
+
+      // enfoque básico cuando el menú está abierto
+      document.addEventListener('focusin', (e) => {
+        if (!mobileMenu.classList.contains('open')) return;
+        if (mobileMenu.contains(e.target) || hamburger.contains(e.target)) return;
+        const first = mobileMenu.querySelector('a, button');
+        if (first) first.focus();
+      }, true);
+    } // end menu guard
+
+    /* ---------------- THEME TOGGLE ---------------- */
+    const themeToggle = document.getElementById('theme-toggle');
+
+    function applyTheme(mode){
+      if(mode === 'light'){
+        root.classList.add('light');
+        document.body.style.background = 'radial-gradient(ellipse at 50% 0%, #eef6fb, #f6f9fb 70%)';
+        document.body.style.backgroundSize = '100% 200%';
+        document.body.style.animation = 'subtlePan 30s ease-in-out infinite';
+        if (themeToggle) {
+          themeToggle.innerText = '☀️';
+          themeToggle.setAttribute('aria-pressed','true');
+        }
+      } else {
+        root.classList.remove('light');
+        document.body.style.background = '';
+        document.body.style.backgroundSize = '';
+        document.body.style.animation = '';
+        if (themeToggle) {
+          themeToggle.innerText = '🌙';
+          themeToggle.setAttribute('aria-pressed','false');
+        }
+      }
+    }
+
+    // inicializar theme
+    applyTheme(saved ? saved : (prefersLight ? 'light' : 'dark'));
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const isLight = root.classList.toggle('light');
+        applyTheme(isLight ? 'light' : 'dark');
+        localStorage.setItem('theme-mode', isLight ? 'light' : 'dark');
+      });
+      // accesibilidad por teclado
+      themeToggle.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') e.target.click(); });
+    }
+
+    /* --------------- NAVIGATION / SECTIONS --------------- */
+    const links = Array.from(document.querySelectorAll('.sidebar-nav a'));
+    const sections = Array.from(document.querySelectorAll('.content-section'));
+
+    function clearActive(){ links.forEach(l=>l.classList.remove('active')) }
+    function setActive(link){ clearActive(); link.classList.add('active') }
+
+    // click navigation
+    links.forEach(link => {
+      link.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const id = link.getAttribute('href');
+        const target = document.querySelector(id);
+        if(!target) return;
+        target.classList.add('active');
+        setActive(link);
+        sections.forEach(s=>{ if(s!==target) s.classList.remove('active') });
+
+        // reveal elements inside
+        const reveals = target.querySelectorAll('.reveal');
+        reveals.forEach(r=> r.classList.remove('is-visible'));
+        observe(reveals);
+
+        const offset = 100; // nav height
+        const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+        window.scrollTo({top, behavior:'smooth'});
+        history.pushState(null,'',id);
+      });
+    });
+
+    // show initial section (hash or first)
+    function initialShow(){
+      const hash = location.hash && document.querySelector(location.hash) ? location.hash : (links[0] ? links[0].getAttribute('href') : null);
+      if (!hash) return;
+      const initial = document.querySelector(hash);
+      if(initial){
+        initial.classList.add('active');
+        const link = links.find(l=>l.getAttribute('href')===hash);
+        if(link) setActive(link);
+      }
+    }
+
+    /* --------- REVEAL + SCROLL-SPY (IntersectionObserver) --------- */
+    const obs = new IntersectionObserver((entries)=>{
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          if(entry.target.tagName.toLowerCase() === 'article' || entry.target.classList.contains('content-section')){
+            const id = '#' + entry.target.id;
+            const link = links.find(l=>l.getAttribute('href')===id);
+            if(link) setActive(link);
+          }
+        }
+      });
+    }, {threshold: 0.12});
+
+    function observe(nodes){
+      // acepta NodeList o Array
+      Array.from(nodes).forEach(n => {
+        if (n) obs.observe(n);
+      });
+    }
+
+    // observe reveals (si hay)
+    const initialReveals = document.querySelectorAll('.reveal');
+    if (initialReveals && initialReveals.length) {
+      observe(initialReveals);
+      // reveal header immediately
+      initialReveals.forEach(r=> r.classList.add('is-visible'));
+    }
+
+    initialShow();
+
+    /* --------------- COPY BUTTONS --------------- */
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async ()=>{
+        // busca un <pre> siguiente o dentro del wrapper
+        const pre = btn.nextElementSibling || btn.closest('.code-block-wrapper') && btn.closest('.code-block-wrapper').querySelector('pre');
+        if(!pre) return;
+        try{
+          await navigator.clipboard.writeText(pre.innerText);
+          const prev = btn.innerText; btn.innerText = 'Copiado!'; setTimeout(()=> btn.innerText = prev, 1800);
+        }catch(e){ btn.innerText = 'Error'; setTimeout(()=> btn.innerText = 'Copiar', 1400); }
+      });
+    });
+
+    /* --------------- QUIZ (si existe) --------------- */
+    const quizContainer = document.getElementById('quiz-container');
+    if (quizContainer) {
+      const questions = quizContainer.querySelectorAll('.quiz-card');
+      const resultsContainer = document.getElementById('quiz-results-container');
+      const scoreElement = document.getElementById('quiz-score');
+      const resetButton = document.getElementById('quiz-reset-btn');
+      let score = 0;
+      let questionsAnswered = 0;
+
+      questions.forEach(question => {
+        const options = question.querySelectorAll('.quiz-option');
+        options.forEach(option => {
+          option.addEventListener('click', () => {
+            const parentOptions = option.parentElement;
+            if (parentOptions.classList.contains('disabled')) return;
+
+            parentOptions.classList.add('disabled');
+            questionsAnswered++;
+
+            const isCorrect = option.dataset.correct === 'true';
+            const feedback = question.querySelector('.quiz-feedback');
+
+            if (isCorrect) {
+              score++;
+              option.classList.add('correct');
+              if(feedback) { feedback.textContent = '¡Correcto! Excelente.'; feedback.className = 'quiz-feedback correct'; }
+            } else {
+              option.classList.add('incorrect');
+              if(feedback) { feedback.textContent = 'Incorrecto. La respuesta correcta está marcada en verde.'; feedback.className = 'quiz-feedback incorrect'; }
+              const correctOption = parentOptions.querySelector('[data-correct="true"]');
+              if(correctOption) correctOption.classList.add('correct');
+            }
+
+            if (questionsAnswered === questions.length && resultsContainer && scoreElement) {
+              scoreElement.textContent = `Puntuación Final: ${score} de ${questions.length}`;
+              resultsContainer.style.display = 'block';
+            }
+          });
+        });
+      });
+
+      if (resetButton) {
+        resetButton.addEventListener('click', () => {
+          score = 0;
+          questionsAnswered = 0;
+          if (resultsContainer) resultsContainer.style.display = 'none';
+          questions.forEach(question => {
+            const optionsContainer = question.querySelector('.quiz-options');
+            if (optionsContainer) optionsContainer.classList.remove('disabled');
+
+            const options = question.querySelectorAll('.quiz-option');
+            options.forEach(opt => { opt.classList.remove('correct', 'incorrect'); });
+
+            const feedback = question.querySelector('.quiz-feedback');
+            if (feedback) { feedback.textContent = ''; feedback.className = 'quiz-feedback'; }
+          });
+        });
+      }
+    } // end quiz guard
+
+  }); // end DOMContentLoaded
+})(); // end IIFE
+</script>
+
+</body>
+</html>
